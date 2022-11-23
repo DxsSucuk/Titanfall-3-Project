@@ -7,9 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        projectPath: ~/Titanfall-Project-With-BT
         working-directory: ~/Titanfall-Project-With-BT
-        buildName: TF3-By-Harald
     strategy:
       fail-fast: false
       matrix:
@@ -21,10 +19,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
+          buildName: TF3-By-Harald
+          projectPath: Titanfall-Project-With-BT
           fetch-depth: 0
           lfs: true
       - uses: actions/cache@v2
         with:
+          buildName: TF3-By-Harald
+          projectPath: Titanfall-Project-With-BT
           path: Library
           key:
             Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**',
@@ -37,9 +39,11 @@ jobs:
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
+          buildName: TF3-By-Harald
+          projectPath: Titanfall-Project-With-BT
           targetPlatform: ${{ matrix.targetPlatform }}
           versioning: Semantic
       - uses: actions/upload-artifact@v2
         with:
           name: Build-${{ matrix.targetPlatform }}
-          path: build/${{ matrix.targetPlatform }}
+          path: Titanfall-Project-With-BT/build/${{ matrix.targetPlatform }}
