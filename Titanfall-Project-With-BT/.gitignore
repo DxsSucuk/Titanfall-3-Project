@@ -69,11 +69,8 @@ ExportedObj/
 *.tmp
 *.user
 *.userprefs
-*.pidb
 *.booproj
 *.svd
-*.pdb
-*.mdb
 *.opendb
 *.VC.db
 
@@ -141,7 +138,6 @@ StyleCopReport.xml
 *.obj
 *.iobj
 *.pch
-*.pdb
 *.ipdb
 *.pgc
 *.pgd
