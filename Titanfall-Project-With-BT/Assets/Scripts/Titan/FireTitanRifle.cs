@@ -20,7 +20,7 @@ public class FireTitanRifle : NetworkBehaviour
 
     bool canShoot;
     bool readyToShoot = true;
-    bool isReloading = false;
+    bool isReloading;
 
     public float timeBetweenShots, timeBetweenShooting;
     public float spread;
@@ -46,6 +46,8 @@ public class FireTitanRifle : NetworkBehaviour
 
     void Update()
     {
+        if (!HasInputAuthority) return;
+        
         if (enterScript.inTitan)
         {
             HandleInput();

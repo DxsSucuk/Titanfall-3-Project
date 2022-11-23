@@ -7,8 +7,7 @@ using Fusion;
 
 public class PilotMovement : NetworkBehaviour
 {
-    [Header("Player Components")]
-    CharacterController controller;
+    [Header("Player Components")] CharacterController controller;
 
     private PlayerInput controls;
     private InputAction jumpAction;
@@ -20,14 +19,11 @@ public class PilotMovement : NetworkBehaviour
     public GameObject body;
     public GameObject climbCheck;
 
-    public TextMeshProUGUI velocityText;
-
     public InputValues wallInputDifference;
     public InputValues wallNormalDirection;
     public InputValues boostInputDifference;
 
-    [Header("Basic Movement")]
-    Vector3 move;
+    [Header("Basic Movement")] Vector3 move;
     Vector3 input;
     Vector2 moveData;
     Vector3 Yvelocity;
@@ -56,13 +52,12 @@ public class PilotMovement : NetworkBehaviour
     bool isWallRunning;
     public bool isGrounded;
     public bool isMoving;
-    
+
     float jumpCooldown = 0f;
     int jumpCharges;
     float inAir;
 
-    [Header("Crouch")]
-    float startHeight;
+    [Header("Crouch")] float startHeight;
     float crouchHeight = 0.5f;
     float slideTimer;
     bool canBoost = true;
@@ -76,8 +71,7 @@ public class PilotMovement : NetworkBehaviour
 
     public float slideSpeedIncrease;
 
-    [Header("Wallrun")]
-    bool onLeftWall;
+    [Header("Wallrun")] bool onLeftWall;
     bool onRightWall;
     bool hasWallRun = false;
     private RaycastHit leftWallHit;
@@ -86,21 +80,18 @@ public class PilotMovement : NetworkBehaviour
     Vector3 lastWall;
     float wallDistance = 1f;
 
-    [Header("Climbing")]
-    bool isClimbing;
+    [Header("Climbing")] bool isClimbing;
     bool hasClimbed;
     bool canClimb;
     private RaycastHit wallHit;
     float climbTimer;
     public float maxClimbTimer;
 
-    [Header("WallJumping")]
-    bool isWallJumping;
+    [Header("WallJumping")] bool isWallJumping;
     float wallJumpTimer;
     public float maxWallJumpTimer;
 
-    [Header("Camera Effects")]
-    public Camera playerCamera;
+    [Header("Camera Effects")] public Camera playerCamera;
     float normalFov;
     public float specialFov;
     float slideFov;
@@ -108,14 +99,12 @@ public class PilotMovement : NetworkBehaviour
     public float wallRunTilt;
     public float tilt;
 
-    [Header("Lurch")]
-    float lurchTimer;
+    [Header("Lurch")] float lurchTimer;
     bool lurch;
     bool canLurch = true;
     bool groundBoost;
 
-    [Header("TurnInAir")]
-    Vector3 oldForward;
+    [Header("TurnInAir")] Vector3 oldForward;
     Vector3 newForward;
     bool turn = true;
 
@@ -124,7 +113,7 @@ public class PilotMovement : NetworkBehaviour
         controller = GetComponent<CharacterController>();
         startHeight = transform.localScale.y;
         normalFov = playerCamera.fieldOfView;
-        
+
         controls = GetComponent<PlayerInput>();
         jumpAction = controls.actions["Jump"];
     }
@@ -143,8 +132,7 @@ public class PilotMovement : NetworkBehaviour
     void Update()
     {
         if (!HasInputAuthority) return;
-
-        velocityText.text = speed.ToString();
+        
         SecondChanceJump();
         HandleInput();
         CheckClimbing();
@@ -152,12 +140,10 @@ public class PilotMovement : NetworkBehaviour
         SlideBoost();
         CheckMoving();
 
-        if (turn == true && (!isGrounded || isSliding))
+        if (turn && (!isGrounded || isSliding))
         {
-
             StartCoroutine(TurningDecreasesSpeed());
             turn = false;
-
         }
 
         if (isGrounded && !isSliding)
@@ -167,7 +153,6 @@ public class PilotMovement : NetworkBehaviour
         else if (!isGrounded && !isWallRunning && !isClimbing)
         {
             AirMovement();
-
         }
         else if (isSliding)
         {
@@ -181,7 +166,6 @@ public class PilotMovement : NetworkBehaviour
         else if (isWallRunning)
         {
             WallRunMovement();
-
         }
         else if (isClimbing)
         {
@@ -189,7 +173,8 @@ public class PilotMovement : NetworkBehaviour
             climbTimer -= 1f * Time.deltaTime;
             if (climbTimer < 0)
             {
-                if (Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask) && Physics.Raycast(climbCheck.transform.position, transform.forward, 4f, groundMask) == false)
+                if (Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask) &&
+                    Physics.Raycast(climbCheck.transform.position, transform.forward, 4f, groundMask) == false)
                 {
                     climbTimer += 0.3f;
                     speed += 3f;
@@ -201,6 +186,7 @@ public class PilotMovement : NetworkBehaviour
                 }
             }
         }
+
         controller.Move(move * Time.deltaTime);
         ApplyGravity();
         CameraEffects();
@@ -226,10 +212,11 @@ public class PilotMovement : NetworkBehaviour
         {
             speed = 0f;
         }
-        else if (isGrounded && isSliding )
+        else if (isGrounded && isSliding)
         {
             DecreaseSpeed(friction);
         }
+        // Why have two different if-statement if they do the same? why not merge?
         else if (isGrounded)
         {
             speed = Mathf.SmoothStep(speed, desiredSpeed, 9f * Time.deltaTime);
@@ -305,14 +292,16 @@ public class PilotMovement : NetworkBehaviour
         {
             isSprinting = false;
         }
-        
+
 
         if (jumpAction.triggered && jumpCharges > 0)
         {
             Invoke("Jump", jumpCooldown);
         }
 
-        if (!isGrounded && !isWallJumping && (Vector3.Dot(-transform.right, input.normalized) > 0.4 || Vector3.Dot(transform.right, input.normalized) > 0.4) && canLurch == true)
+        if (!isGrounded && !isWallJumping &&
+            (Vector3.Dot(-transform.right, input.normalized) > 0.4 ||
+             Vector3.Dot(transform.right, input.normalized) > 0.4) && canLurch)
         {
             speed -= 1f;
             forwardDirection = input;
@@ -320,7 +309,9 @@ public class PilotMovement : NetworkBehaviour
             lurchTimer = 0.3f;
             canLurch = false;
         }
-        else if (isGrounded && (Vector3.Dot(-transform.right, input.normalized) > boostInputDifference.value || Vector3.Dot(transform.right, input.normalized) > boostInputDifference.value) && groundBoost == true)
+        else if (isGrounded &&
+                 (Vector3.Dot(-transform.right, input.normalized) > boostInputDifference.value ||
+                  Vector3.Dot(transform.right, input.normalized) > boostInputDifference.value) && groundBoost)
         {
             speed += 0.65f;
             groundBoost = false;
@@ -367,7 +358,9 @@ public class PilotMovement : NetworkBehaviour
         onRightWall = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallDistance, groundMask);
         onLeftWall = Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallDistance, groundMask);
 
-        if ((onRightWall && Vector3.Dot(transform.right, input.normalized) > wallInputDifference.value || onLeftWall && Vector3.Dot(-transform.right, input.normalized) > wallInputDifference.value) && !isWallRunning && !isGrounded && !isSliding)
+        if ((onRightWall && Vector3.Dot(transform.right, input.normalized) > wallInputDifference.value ||
+             onLeftWall && Vector3.Dot(-transform.right, input.normalized) > wallInputDifference.value) &&
+            !isWallRunning && !isGrounded && !isSliding)
         {
             TestWallRun();
         }
@@ -381,13 +374,15 @@ public class PilotMovement : NetworkBehaviour
     void CheckClimbing()
     {
         canClimb = Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask);
-        if (Vector3.Dot(wallHit.normal.normalized, Vector3.up) < -wallNormalDirection.value || Vector3.Dot(wallHit.normal.normalized, Vector3.up) > wallNormalDirection.value)
+        if (Vector3.Dot(wallHit.normal.normalized, Vector3.up) < -wallNormalDirection.value ||
+            Vector3.Dot(wallHit.normal.normalized, Vector3.up) > wallNormalDirection.value)
         {
             return;
         }
 
         float wallAngle = Vector3.Angle(-wallHit.normal, transform.forward);
-        if (wallAngle < 15 && canClimb && !hasClimbed && Vector3.Dot(transform.forward, input.normalized) > wallInputDifference.value)
+        if (wallAngle < 15 && canClimb && !hasClimbed &&
+            Vector3.Dot(transform.forward, input.normalized) > wallInputDifference.value)
         {
             isClimbing = true;
         }
@@ -409,6 +404,7 @@ public class PilotMovement : NetworkBehaviour
         {
             move.x = 0;
         }
+
         if (input.z != 0)
         {
             move.z += input.z * speed;
@@ -433,6 +429,7 @@ public class PilotMovement : NetworkBehaviour
             move.x += input.x * airSpeedMultiplier;
             move.z += input.z * airSpeedMultiplier;
         }
+
         if (isWallJumping)
         {
             move += forwardDirection * airSpeedMultiplier;
@@ -442,6 +439,7 @@ public class PilotMovement : NetworkBehaviour
                 isWallJumping = false;
             }
         }
+
         if (lurch)
         {
             move += forwardDirection;
@@ -473,7 +471,6 @@ public class PilotMovement : NetworkBehaviour
 
     void WallRunMovement()
     {
-
         wallNormal = onRightWall ? rightWallHit.normal : leftWallHit.normal;
 
         forwardDirection = Vector3.Cross(wallNormal, Vector3.up);
@@ -506,7 +503,7 @@ public class PilotMovement : NetworkBehaviour
     void ClimbMovement()
     {
         if (Vector3.Dot(transform.forward, input.normalized) < wallInputDifference.value)
-        { 
+        {
             hasClimbed = true;
             Yvelocity.y = 1f;
             isClimbing = false;
@@ -545,8 +542,10 @@ public class PilotMovement : NetworkBehaviour
             {
                 slideFov = 92f;
             }
+
             slideTimer = maxSlideTimer;
         }
+
         isCrouching = true;
     }
 
@@ -594,14 +593,17 @@ public class PilotMovement : NetworkBehaviour
 
     void WallRun()
     {
-        if (speed < 8){
-        desiredSpeed = 10;
+        if (speed < 8)
+        {
+            desiredSpeed = 10;
         }
-        else if(speed <13){
-        desiredSpeed = speed+2;
+        else if (speed < 13)
+        {
+            desiredSpeed = speed + 2;
         }
-        else{
-        desiredSpeed = speed;
+        else
+        {
+            desiredSpeed = speed;
         }
 
         wallDistance = 2f;
@@ -690,10 +692,12 @@ public class PilotMovement : NetworkBehaviour
         {
             speed -= ((speed * 0.1f) * (1f - difference));
         }
+
         if (difference < 0.45 && inputDifference < 0.9)
         {
             speed -= ((speed * 0.3f) * (1f - difference));
         }
+
         if (speed < 0)
             speed = 0;
         turn = true;

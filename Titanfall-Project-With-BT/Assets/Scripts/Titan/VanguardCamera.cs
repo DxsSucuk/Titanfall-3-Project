@@ -57,6 +57,8 @@ public class VanguardCamera : NetworkBehaviour
  
     void Update()
     {
+        if (!HasInputAuthority) return;
+        
         if (enterScript.inTitan)
         {
            
