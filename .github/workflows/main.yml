@@ -9,6 +9,7 @@ jobs:
       run:
         projectPath: ~/Titanfall-Project-With-BT
         working-directory: ~/Titanfall-Project-With-BT
+        buildName: TF3-By-Harald
     strategy:
       fail-fast: false
       matrix:
