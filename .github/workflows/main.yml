@@ -19,8 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          buildName: TF3-By-Harald
-          projectPath: Titanfall-Project-With-BT
           fetch-depth: 0
           lfs: true
       - uses: actions/cache@v2
