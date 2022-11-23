@@ -25,9 +25,7 @@ jobs:
           lfs: true
       - uses: actions/cache@v2
         with:
-          buildName: TF3-By-Harald
-          projectPath: Titanfall-Project-With-BT
-          path: Library
+          path: Titanfall-Project-With-BT/Library
           key:
             Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**',
             'ProjectSettings/**') }}
