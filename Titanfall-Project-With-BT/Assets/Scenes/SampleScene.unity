@@ -10094,8 +10094,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _playerPrefab:
     RawGuidValue: 20e910137b0efb044b61e1d535009af4
-  _vanguardTitanPrefab:
-    RawGuidValue: cf462d6715c994f4d848251fb0993fa2
   spawnA: {fileID: 1297519516}
   spawnB: {fileID: 1851533970}
 --- !u!1 &614739356
@@ -37566,7 +37564,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2099873615}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -64.2, y: 0, z: 90.6}
+  m_LocalPosition: {x: -64.2, y: 100, z: 90.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
