@@ -44,4 +44,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: Build-${{ matrix.targetPlatform }}
-          path: Titanfall-Project-With-BT/build/${{ matrix.targetPlatform }}
+          path: Titanfall-Project-With-BT/build/TF3-By-Harald
