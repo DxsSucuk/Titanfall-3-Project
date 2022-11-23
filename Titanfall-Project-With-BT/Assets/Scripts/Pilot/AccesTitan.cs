@@ -1,5 +1,4 @@
 using Fusion;
-
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -7,10 +6,10 @@ using UnityEngine;
 
 public class AccesTitan : NetworkBehaviour
 {
-    [Networked]
+    [SerializeField] private NetworkPrefabRef _vanguardTitanPrefab;
+
     public NetworkObject TitanObject { get; set; }
-    
-    [Networked]
+
     public EnterVanguardTitan TitanScript { get; set; }
 
     GameObject[] titanDropPoints;
@@ -27,42 +26,74 @@ public class AccesTitan : NetworkBehaviour
         StartTitanFall();
         EmbarkWithTitan();
     }
- 
+
     void StartTitanFall()
     {
         if (!HasInputAuthority) return;
-        
+
         if (Input.GetKeyDown(KeyCode.V))
         {
-            MoveTitanToDropLocation();
-            TitanScript.StartFall();
+            SpawnToDropLocation();
+            if (TitanScript != null)
+                TitanScript.StartFall();
         }
     }
 
-    private void MoveTitanToDropLocation()
+    private void SpawnToDropLocation()
     {
-        for (int i = 0; i < titanDropPoints.Length; i++)
+        if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
         {
-            float distance = Vector3.Distance(titanDropPoints[i].transform.position, this.transform.position);
-            if (distance < shortestDistance || shortestDistance == 0f)
+            
+            for (int i = 0; i < titanDropPoints.Length; i++)
             {
-                shortestDistance = distance;
-                chosenPoint = titanDropPoints[i].transform;
+                float distance = Vector3.Distance(titanDropPoints[i].transform.position, this.transform.position);
+                if (distance < shortestDistance || shortestDistance == 0f)
+                {
+                    shortestDistance = distance;
+                    chosenPoint = titanDropPoints[i].transform;
+                }
+            }
+
+            NetworkObject networkPlayerTitanObject =
+                Runner.Spawn(_vanguardTitanPrefab, chosenPoint.transform.position, Quaternion.identity,
+                    Runner.LocalPlayer);
+            networkPlayerTitanObject.gameObject.layer = 6;
+            SetLayerRecrusivly(networkPlayerTitanObject.transform);
+            TitanObject = networkPlayerTitanObject;
+
+            EnterVanguardTitan enterVanguardTitan = TitanObject.GetComponent<EnterVanguardTitan>();
+
+            enterVanguardTitan.player = networkPlayerObject.gameObject;
+
+            enterVanguardTitan.playerCamera = enterVanguardTitan.player.GetComponentInChildren<Camera>().gameObject;
+
+            TitanScript = enterVanguardTitan;
+        }
+    }
+
+    private void SetLayerRecrusivly(Transform parent)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.gameObject.layer == 9)
+            {
+                child.gameObject.layer = 6;
+            }
+
+            if (child.childCount > 0)
+            {
+                SetLayerRecrusivly(child);
             }
         }
-        //trying to move the titan to a specific drop point, does not work, would be good if you cold spawn the titan at this point
-        TitanObject.transform.position = chosenPoint.transform.position;
     }
-
 
     void EmbarkWithTitan()
     {
         if (!HasInputAuthority) return;
-        
-        if (Input.GetKeyDown(KeyCode.F) && TitanScript.inRangeForEmbark)
+
+        if (TitanScript != null && Input.GetKeyDown(KeyCode.F) && TitanScript.inRangeForEmbark)
         {
             StartCoroutine(TitanScript.Embark());
         }
     }
-
 }

@@ -7,7 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Titanfall-Project-With-BT
+        projectPath: ~/Titanfall-Project-With-BT
+        working-directory: ~/Titanfall-Project-With-BT
     strategy:
       fail-fast: false
       matrix:

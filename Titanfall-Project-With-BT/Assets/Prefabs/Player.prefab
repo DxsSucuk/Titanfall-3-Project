@@ -394,6 +394,7 @@ GameObject:
   - component: {fileID: 3894134462755980390}
   - component: {fileID: -3711079012651501327}
   - component: {fileID: 5811566881052186957}
+  - component: {fileID: 2764054555789011450}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -452,8 +453,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _TitanObject: {fileID: 1775270118597831475, guid: cf462d6715c994f4d848251fb0993fa2, type: 3}
-  _TitanScript: {fileID: 6743662489385095293, guid: cf462d6715c994f4d848251fb0993fa2, type: 3}
 --- !u!114 &2221782363576981722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,6 +478,7 @@ MonoBehaviour:
   - {fileID: 4186822761668775030}
   - {fileID: 3894134462755980390}
   - {fileID: -3711079012651501327}
+  - {fileID: 2764054555789011450}
   SimulationBehaviours: []
 --- !u!114 &3894134462755980390
 MonoBehaviour:
@@ -575,6 +575,34 @@ MonoBehaviour:
   m_DefaultActionMap: Pilot
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &2764054555789011450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4186822761668775023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 4186822761181016723}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
 --- !u!1 &9135305802766639889
 GameObject:
   m_ObjectHideFlags: 0

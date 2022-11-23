@@ -11,8 +11,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     [SerializeField] private NetworkPrefabRef _playerPrefab;
 
-    [SerializeField] private NetworkPrefabRef _vanguardTitanPrefab;
-
     public Transform spawnA;
     public Transform spawnB;
 
@@ -92,47 +90,15 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             // Create a unique position for the player
             Vector3 spawnPosition = spawnB.position;
-            Vector3 titanPosition = spawnPosition;
-            titanPosition.y = 178;
             NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
 
             runner.SetPlayerObject(player, networkPlayerObject);
-
-            NetworkObject networkPlayerTitanObject =
-                runner.Spawn(_vanguardTitanPrefab, titanPosition, Quaternion.identity, player);
-
-            networkPlayerTitanObject.gameObject.layer = 6;
-            SetLayerRecrusivly(networkPlayerTitanObject.transform);
-
-            AccesTitan accesTitan = networkPlayerObject.GetComponent<AccesTitan>();
-            accesTitan.TitanObject = networkPlayerTitanObject;
-            EnterVanguardTitan enterVanguardTitan = networkPlayerTitanObject.GetComponent<EnterVanguardTitan>();
-            enterVanguardTitan.player = networkPlayerObject.gameObject;
-
-            enterVanguardTitan.playerCamera = enterVanguardTitan.player.GetComponentInChildren<Camera>().gameObject;
-            accesTitan.TitanScript = enterVanguardTitan;
 
             // Keep track of the player avatars so we can remove it when they disconnect
             _spawnedCharacters.Add(player, networkPlayerObject);
         }
     }
 
-    private void SetLayerRecrusivly(Transform parent)
-    {
-        foreach (Transform child in parent)
-        {
-            if (child.gameObject.layer == 9)
-            {
-                child.gameObject.layer = 6;
-            }
-
-            if (child.childCount > 0)
-            {
-                SetLayerRecrusivly(child);
-            }
-        }
-    }
-    
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log("Player left Server -> " + runner.name);
