@@ -20,8 +20,6 @@ public class PilotMovement : NetworkBehaviour
     public GameObject body;
     public GameObject climbCheck;
 
-    public TextMeshProUGUI velocityText;
-
     public InputValues wallInputDifference;
     public InputValues wallNormalDirection;
     public InputValues boostInputDifference;
@@ -143,8 +141,7 @@ public class PilotMovement : NetworkBehaviour
     {
         if (!HasInputAuthority)
             return;
-
-        velocityText.text = speed.ToString();
+        
         SecondChanceJump();
         HandleInput();
 
