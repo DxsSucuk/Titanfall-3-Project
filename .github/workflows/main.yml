@@ -1,6 +1,8 @@
 name: Unity Builds
 on:
-  ['push']
+  workflow_dispatch: {}
+  push:
+    types: [published]
 jobs:
   buildForWindowsAndLinux:
     name: Build for ${{ matrix.targetPlatform }}
