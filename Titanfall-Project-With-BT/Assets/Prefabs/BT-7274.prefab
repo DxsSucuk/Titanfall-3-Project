@@ -41291,6 +41291,7 @@ GameObject:
   - component: {fileID: 6553414488199295633}
   - component: {fileID: 1775270118597831475}
   - component: {fileID: 7074905497601110381}
+  - component: {fileID: 8318890931827569869}
   m_Layer: 9
   m_Name: BT-7274
   m_TagString: Untagged
@@ -41406,6 +41407,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  controls: {fileID: 0}
+  dashAction:
+    m_Name: Dash
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 202dd7e7-0129-48bc-99b5-50b0d343157d
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
   groundCheck: {fileID: 6743662488958111497}
   groundMask:
     serializedVersion: 2
@@ -41415,9 +41426,9 @@ MonoBehaviour:
   isSprinting: 0
   isDashing: 0
   isMoving: 0
-  walkSpeed: 7
-  runSpeed: 14
-  sprintSpeed: 18
+  walkSpeed: 5
+  runSpeed: 11
+  sprintSpeed: 15
   normalGravity: -13
 --- !u!114 &6743662489385095235
 MonoBehaviour:
@@ -41435,7 +41446,7 @@ MonoBehaviour:
   titanAnimator: {fileID: 5861193692946347020}
   minX: -60
   maxX: 60
-  sensitivity: 4.5
+  sensitivity: 0.5
   cam: {fileID: 6743662488019150949}
   sprintBobSpeed: 12
   walkBobSpeed: 7.5
@@ -41471,6 +41482,16 @@ MonoBehaviour:
   spread: 0.02
   bulletsPerTap: 1
   bulletsLeft: 500
+  controls: {fileID: 0}
+  reloadAction:
+    m_Name: Reload
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: b21bc434-a74c-40a5-a817-2805d91692e4
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!114 &6553414488199295633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41558,6 +41579,36 @@ MonoBehaviour:
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
+--- !u!114 &8318890931827569869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6743662489385095242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 0d55f68a4392ee44cb1a1e0ce82405c8, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: VanguardTitan
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &6743662489393025859
 GameObject:
   m_ObjectHideFlags: 0

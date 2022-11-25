@@ -2,10 +2,14 @@ using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class VanguardMovement : NetworkBehaviour
 {
     CharacterController controller;
+
+    public PlayerInput controls;
+    public InputAction dashAction;
 
     public Transform groundCheck;
 
@@ -14,7 +18,9 @@ public class VanguardMovement : NetworkBehaviour
     public Animator titanAnimator;
 
     bool isRunning;
+    bool shouldWalk;
     public bool isWalking;
+    bool shouldSprint;
     public bool isSprinting;
     public bool isDashing;
     bool isGrounded;
@@ -30,6 +36,7 @@ public class VanguardMovement : NetworkBehaviour
     Vector3 move;
     Vector3 forwardDirection;
     Vector3 Yvelocity;
+    Vector2 moveData;
 
     EnterVanguardTitan enterScript;
 
@@ -38,11 +45,31 @@ public class VanguardMovement : NetworkBehaviour
     {
         controller = GetComponent<CharacterController>();
         enterScript = GetComponent<EnterVanguardTitan>();
+
+        controls = GetComponent<PlayerInput>();
+        dashAction = controls.actions["Dash"];
     }
+
+
+    public void OnMove(InputValue value)
+    {
+        moveData = value.Get<Vector2>();
+    }
+
+    public void OnSprint(InputValue value)
+    {
+        shouldSprint = value.isPressed;
+    }
+
+    public void OnWalk(InputValue value)
+    {
+        shouldWalk = value.isPressed;
+    }
+
 
     void HandleInput()
     {
-        input = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+        input = new Vector3(moveData.x, 0f, moveData.y);
 
         titanAnimator.SetFloat("moveX", input.x, 0.1f, Time.deltaTime);
         titanAnimator.SetFloat("moveZ", input.z, 0.1f, Time.deltaTime);
@@ -50,27 +77,27 @@ public class VanguardMovement : NetworkBehaviour
         input = transform.TransformDirection(input);
         input = Vector3.ClampMagnitude(input, 1f);
 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !isWalking)
+        if (shouldSprint && !isWalking)
         {
             isSprinting = true;
         }
 
-        if (Input.GetKeyUp(KeyCode.LeftShift))
+        if (!shouldSprint)
         {
             isSprinting = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.Mouse2) && !isSprinting)
+        if (shouldWalk && !isSprinting)
         {
             isWalking = true;
         }
 
-        if (Input.GetKeyUp(KeyCode.Mouse2))
+        if (!shouldWalk)
         {
             isWalking = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (dashAction.triggered && !isDashing)
         {
             StartCoroutine(HandleDash());
         }
@@ -191,7 +218,7 @@ public class VanguardMovement : NetworkBehaviour
         forwardDirection = input;
         isDashing = true;
 
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.2f);
 
         isDashing = false;
     }
