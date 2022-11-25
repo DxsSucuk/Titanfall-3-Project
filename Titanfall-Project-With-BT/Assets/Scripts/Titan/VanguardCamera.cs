@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class VanguardCamera : NetworkBehaviour
 {
@@ -31,6 +32,7 @@ public class VanguardCamera : NetworkBehaviour
     private float timer;
  
     Vector3 lastMousePosition;
+    Vector2 look;
  
     void Awake()
     {
@@ -54,14 +56,19 @@ public class VanguardCamera : NetworkBehaviour
             }
         }
     }
- 
+
+    public void OnLook(InputValue value)
+    {
+        look = value.Get<Vector2>() * sensitivity;
+    }
+
     void Update()
     {
         if (enterScript.inTitan)
         {
            
-            rotY += Input.GetAxis("Mouse X") * sensitivity;
-            rotX += Input.GetAxis("Mouse Y") * sensitivity;
+            rotY += look.x;
+            rotX += look.y;
  
             rotX = Mathf.Clamp(rotX, minX, maxX);
    

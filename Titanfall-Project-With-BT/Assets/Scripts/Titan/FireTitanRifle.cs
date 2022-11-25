@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class FireTitanRifle : NetworkBehaviour
 {
@@ -28,9 +29,17 @@ public class FireTitanRifle : NetworkBehaviour
     public int bulletsPerTap, bulletsLeft;
     int bulletsShot;
 
+    public PlayerInput controls;
+    public InputAction reloadAction;
+
+    private void Start()
+    {
+        controls = GetComponent<PlayerInput>();
+        reloadAction = controls.actions["Reload"];
+    }
+
     void HandleInput()
     {
-        canShoot = Input.GetKey(KeyCode.Mouse0);
 
         if (readyToShoot && canShoot && bulletsLeft > 0 && !isReloading)
         {
@@ -38,10 +47,15 @@ public class FireTitanRifle : NetworkBehaviour
             ShootRPC();
         }
 
-        if (Input.GetKeyDown(KeyCode.R) && bulletsLeft < 500 && !moveScript.isDashing)
+        if (reloadAction.triggered && bulletsLeft < 500 && !moveScript.isDashing)
         {
             StartCoroutine(Reload());
         }
+    }
+
+    public void OnFire(InputValue value)
+    {
+        canShoot = value.isPressed;
     }
 
     void Update()
