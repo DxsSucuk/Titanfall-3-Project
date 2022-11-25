@@ -28,9 +28,13 @@ public class AccesTitan : NetworkBehaviour
     {
         if (!HasInputAuthority) return;
 
-        if (Input.GetKeyDown(KeyCode.V))
+        if (Input.GetKeyDown(KeyCode.V) && (TitanObject == null || !TitanObject.isActiveAndEnabled))
         {
+            if (TitanObject != null)
+                Runner.Despawn(TitanObject);
+            
             SpawnToDropLocation();
+            
             if (TitanScript != null)
                 TitanScript.StartFall();
         }
@@ -83,7 +87,8 @@ public class AccesTitan : NetworkBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(chosenPoint.position, 5);
+        if (chosenPoint != null)
+            Gizmos.DrawSphere(chosenPoint.position, 5);
     }
     
     private void SetLayerRecrusivly(Transform parent)

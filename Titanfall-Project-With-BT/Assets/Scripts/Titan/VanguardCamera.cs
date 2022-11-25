@@ -13,9 +13,11 @@ public class VanguardCamera : NetworkBehaviour
     public float sensitivity;
     public Camera cam;
  
-    float rotY = 0f;
-    float rotX = 0f;
-    float yaw;
+    [Networked] private float RotY { get; set; }
+    
+    [Networked] private float RotX { get; set; }
+    
+    [Networked] private float Yaw { get; set; }
  
     EnterVanguardTitan enterScript;
     VanguardMovement moveScript;
@@ -64,27 +66,33 @@ public class VanguardCamera : NetworkBehaviour
 
     void Update()
     {
-        if (!HasInputAuthority) return;
-        
-        if (enterScript.inTitan)
+        if (!HasInputAuthority)
         {
-           
-            rotY += look.x;
-            rotX += look.y;
- 
-            rotX = Mathf.Clamp(rotX, minX, maxX);
-   
-            transform.localEulerAngles = new Vector3(0, rotY, 0);
-            cam.transform.localEulerAngles = new Vector3(-rotX, 0, 0);
-           
-            yaw -= Input.GetAxisRaw("Mouse Y") * 0.1f;
-            yaw = Mathf.Clamp(yaw, -1f, 1f);
- 
-            titanAnimator.SetFloat("aim", yaw, 0.1f, Time.deltaTime);  
- 
-            HandleHeadBob();  
+            transform.localEulerAngles = new Vector3(0, RotY, 0);
+            cam.transform.localEulerAngles = new Vector3(-RotX, 0, 0);
         }
- 
+        else
+        {
+
+            if (enterScript.inTitan)
+            {
+
+                RotY += look.x;
+                RotX += look.y;
+
+                RotX = Mathf.Clamp(RotX, minX, maxX);
+
+                transform.localEulerAngles = new Vector3(0, RotY, 0);
+                cam.transform.localEulerAngles = new Vector3(-RotX, 0, 0);
+
+                Yaw -= Input.GetAxisRaw("Mouse Y") * 0.1f;
+                Yaw = Mathf.Clamp(Yaw, -1f, 1f);
+
+                titanAnimator.SetFloat("aim", Yaw, 0.1f, Time.deltaTime);
+
+                HandleHeadBob();
+            }
+        }
     }
  
     void HandleHeadBob()

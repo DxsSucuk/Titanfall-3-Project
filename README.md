@@ -7,7 +7,6 @@ For the multiplayer we have used Photon Fusion to get a simple yet capable netwo
 
 Known Issues:
 * Player does not respawn after leaving Titan.
-* Shots are not synchronized
 
 # Credits
 Mainly developed by [Harald](https://www.youtube.com/@harald1)
