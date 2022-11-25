@@ -46,7 +46,6 @@ public class PilotMovement : NetworkBehaviour
     float gravity;
     public float normalGravity;
     public float wallRunGravity;
-    public float jumpHeight;
 
     bool shouldSprint;
     public bool isSprinting;
@@ -56,7 +55,9 @@ public class PilotMovement : NetworkBehaviour
     bool isWallRunning;
     public bool isGrounded;
     public bool isMoving;
-    
+
+    [Header("Jump")]
+    public float jumpHeight;
     float jumpCooldown = 0f;
     int jumpCharges;
     float inAir;
@@ -66,14 +67,13 @@ public class PilotMovement : NetworkBehaviour
     float crouchHeight = 0.5f;
     float slideTimer;
     bool canBoost = true;
-    float slideBoostWait;
     public float maxSlideTimer;
     Vector3 crouchingCenter = new Vector3(0, 0.5f, 0);
     Vector3 standingCenter = new Vector3(0, 0, 0);
 
+    [Header("Slide")]
     float friction;
-    RaycastHit groudHit;
-
+    RaycastHit groundHit;
     public float slideSpeedIncrease;
 
     [Header("Wallrun")]
@@ -99,15 +99,6 @@ public class PilotMovement : NetworkBehaviour
     float wallJumpTimer;
     public float maxWallJumpTimer;
 
-    [Header("Camera Effects")]
-    public Camera playerCamera;
-    float normalFov;
-    public float specialFov;
-    float slideFov;
-    public float cameraChangeTime;
-    public float wallRunTilt;
-    public float tilt;
-
     [Header("Lurch")]
     float lurchTimer;
     bool lurch;
@@ -119,12 +110,21 @@ public class PilotMovement : NetworkBehaviour
     Vector3 newForward;
     bool turn = true;
 
+    [Header("Camera Effects")]
+    public Camera playerCamera;
+    float normalFov;
+    public float specialFov;
+    float slideFov;
+    public float cameraChangeTime;
+    public float wallRunTilt;
+    public float tilt;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         startHeight = transform.localScale.y;
         normalFov = playerCamera.fieldOfView;
-        
+
         controls = GetComponent<PlayerInput>();
         jumpAction = controls.actions["Jump"];
     }
@@ -139,128 +139,67 @@ public class PilotMovement : NetworkBehaviour
         speed -= speedDecrease * Time.deltaTime;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (!HasInputAuthority) return;
+        if (!HasInputAuthority)
+            return;
 
         velocityText.text = speed.ToString();
         SecondChanceJump();
         HandleInput();
-        CheckClimbing();
-        CheckWallRun();
-        SlideBoost();
-        CheckMoving();
 
-        if (turn == true && (!isGrounded || isSliding))
-        {
-
-            StartCoroutine(TurningDecreasesSpeed());
-            turn = false;
-
-        }
-
-        if (isGrounded && !isSliding)
-        {
-            GroundedMovement();
-        }
-        else if (!isGrounded && !isWallRunning && !isClimbing)
-        {
-            AirMovement();
-
-        }
-        else if (isSliding)
+        if (isSliding)
         {
             SlideMovement();
-            slideTimer -= 1f * Time.deltaTime;
-            if (slideTimer <= 0)
-            {
-                isSliding = false;
-            }
+        }
+        else if (isGrounded)
+        {
+            GroundedMovement();
         }
         else if (isWallRunning)
         {
             WallRunMovement();
-
         }
         else if (isClimbing)
         {
             ClimbMovement();
-            climbTimer -= 1f * Time.deltaTime;
-            if (climbTimer < 0)
-            {
-                if (Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask) && Physics.Raycast(climbCheck.transform.position, transform.forward, 4f, groundMask) == false)
-                {
-                    climbTimer += 0.3f;
-                    speed += 3f;
-                }
-                else
-                {
-                    hasClimbed = true;
-                    isClimbing = false;
-                }
-            }
         }
+        else if (!isGrounded)
+        {
+            AirMovement();
+        }
+
         controller.Move(move * Time.deltaTime);
         ApplyGravity();
         CameraEffects();
     }
 
-    void CheckMoving()
-    {
-        if (input == new Vector3(0f, 0f, 0f) && isGrounded && !isSliding)
-        {
-            isMoving = false;
-        }
-        else
-        {
-            isMoving = true;
-        }
-    }
-
     void FixedUpdate()
     {
         CheckGround();
+        CheckMoving();
+        CheckWallRun();
+        CheckClimbing();
+        CheckTurnInAir();
+        CheckGroundBoost();
+        CheckLurch();
 
         if (!isMoving)
         {
             speed = 0f;
         }
-        else if (isGrounded && isSliding )
+        else if (isGrounded && isSliding)
         {
             DecreaseSpeed(friction);
         }
-        else if (isGrounded)
-        {
-            speed = Mathf.SmoothStep(speed, desiredSpeed, 9f * Time.deltaTime);
-        }
-        else if (isWallRunning)
+        else if (isGrounded || isWallRunning)
         {
             speed = Mathf.SmoothStep(speed, desiredSpeed, 9f * Time.deltaTime);
         }
     }
 
-    void CameraEffects()
-    {
-        float fov = isWallRunning && !isGrounded ? specialFov : isSliding ? slideFov : normalFov;
-        playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, fov, cameraChangeTime * Time.deltaTime);
 
-        if (isWallRunning)
-        {
-            if (onRightWall && !isGrounded)
-            {
-                tilt = Mathf.Lerp(tilt, wallRunTilt, cameraChangeTime * Time.deltaTime);
-            }
-            else if (onLeftWall && !isGrounded)
-            {
-                tilt = Mathf.Lerp(tilt, -wallRunTilt, cameraChangeTime * Time.deltaTime);
-            }
-        }
-        else
-        {
-            tilt = Mathf.Lerp(tilt, 0f, cameraChangeTime * Time.deltaTime);
-        }
-    }
+    //Input
 
     public void OnMove(InputValue value)
     {
@@ -305,41 +244,15 @@ public class PilotMovement : NetworkBehaviour
         {
             isSprinting = false;
         }
-        
 
         if (jumpAction.triggered && jumpCharges > 0)
         {
             Invoke("Jump", jumpCooldown);
         }
-
-        if (!isGrounded && !isWallJumping && (Vector3.Dot(-transform.right, input.normalized) > 0.4 || Vector3.Dot(transform.right, input.normalized) > 0.4) && canLurch == true)
-        {
-            speed -= 1f;
-            forwardDirection = input;
-            lurch = true;
-            lurchTimer = 0.3f;
-            canLurch = false;
-        }
-        else if (isGrounded && (Vector3.Dot(-transform.right, input.normalized) > boostInputDifference.value || Vector3.Dot(transform.right, input.normalized) > boostInputDifference.value) && groundBoost == true)
-        {
-            speed += 0.65f;
-            groundBoost = false;
-            StartCoroutine(BoostCooldown());
-        }
     }
 
-    IEnumerator LurchTimer()
-    {
-        canLurch = true;
-        yield return new WaitForSeconds(0.3f);
-        canLurch = false;
-    }
 
-    IEnumerator BoostCooldown()
-    {
-        yield return new WaitForSeconds(3f);
-        groundBoost = true;
-    }
+    //Groundmovement
 
     void CheckGround()
     {
@@ -362,38 +275,15 @@ public class PilotMovement : NetworkBehaviour
         }
     }
 
-    void CheckWallRun()
+    void CheckMoving()
     {
-        onRightWall = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallDistance, groundMask);
-        onLeftWall = Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallDistance, groundMask);
-
-        if ((onRightWall && Vector3.Dot(transform.right, input.normalized) > wallInputDifference.value || onLeftWall && Vector3.Dot(-transform.right, input.normalized) > wallInputDifference.value) && !isWallRunning && !isGrounded && !isSliding)
+        if (input == new Vector3(0f, 0f, 0f) && isGrounded && !isSliding)
         {
-            TestWallRun();
-        }
-
-        if (!onRightWall && !onLeftWall && isWallRunning)
-        {
-            ExitWallRun();
-        }
-    }
-
-    void CheckClimbing()
-    {
-        canClimb = Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask);
-        if (Vector3.Dot(wallHit.normal.normalized, Vector3.up) < -wallNormalDirection.value || Vector3.Dot(wallHit.normal.normalized, Vector3.up) > wallNormalDirection.value)
-        {
-            return;
-        }
-
-        float wallAngle = Vector3.Angle(-wallHit.normal, transform.forward);
-        if (wallAngle < 15 && canClimb && !hasClimbed && Vector3.Dot(transform.forward, input.normalized) > wallInputDifference.value)
-        {
-            isClimbing = true;
+            isMoving = false;
         }
         else
         {
-            isClimbing = false;
+            isMoving = true;
         }
     }
 
@@ -419,6 +309,64 @@ public class PilotMovement : NetworkBehaviour
         }
 
         move = Vector3.ClampMagnitude(move, speed);
+    }
+
+
+    // Airmovement
+
+    void Jump()
+    {
+        if (isWallRunning)
+        {
+            ExitWallRun();
+            jumpForward = transform.forward;
+        }
+        else if (isGrounded)
+        {
+            StartCoroutine(LurchTimer());
+            jumpForward = transform.forward;
+        }
+        else
+        {
+            jumpCharges -= 1;
+            if (Vector3.Dot(transform.forward, jumpForward) > boostInputDifference.value)
+            {
+                IncreaseSpeed(1.2f);
+            }
+        }
+
+        hasClimbed = false;
+        climbTimer = maxClimbTimer;
+        jumpCooldown = 0.3f;
+        float currentJumpHeight = isCrouching ? jumpHeight * 0.8f : jumpHeight;
+        Yvelocity.y = Mathf.Sqrt(currentJumpHeight * -2f * normalGravity);
+    }
+
+    void SecondChanceJump()
+    {
+        if (!isGrounded && !isWallRunning)
+            inAir -= 1f * Time.deltaTime;
+        if (jumpAction.triggered && inAir > 0)
+            jumpCharges += 1;
+    }
+
+    void CheckLurch()
+    {
+        if (!isGrounded && !isWallJumping && (Vector3.Dot(-transform.right, input.normalized) > 0.4 || Vector3.Dot(transform.right, input.normalized) > 0.4) && canLurch == true)
+        {
+            speed -= 1f;
+            forwardDirection = input;
+            lurch = true;
+            lurchTimer = 0.3f;
+            canLurch = false;
+        }
+    }
+
+    IEnumerator LurchTimer()
+    {
+        canLurch = true;
+        yield return new WaitForSeconds(0.3f);
+        canLurch = false;
     }
 
     void AirMovement()
@@ -455,20 +403,118 @@ public class PilotMovement : NetworkBehaviour
         move = Vector3.ClampMagnitude(move, speed);
     }
 
-    void SlideMovement()
+    void CheckTurnInAir()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out groudHit, 2.2f, groundMask))
+        if (turn == true && (!isGrounded || isSliding))
         {
-            Vector3 normal = groudHit.normal.normalized;
+            StartCoroutine(TurningDecreasesSpeed());
+            turn = false;
+        }
+    }
 
-            float difference = ((Vector3.Dot(normal, transform.forward) * -1) + 1);
+    IEnumerator TurningDecreasesSpeed()
+    {
+        oldForward = transform.forward;
+        oldForward = transform.TransformDirection(oldForward);
 
-            friction = 7f * difference;
+        yield return new WaitForSeconds(0.1f);
+
+        newForward = transform.forward;
+        newForward = transform.TransformDirection(newForward);
+
+        float difference = Vector3.Dot(newForward, oldForward);
+        float inputDifference = Vector3.Dot(input, oldForward);
+
+        if (difference < 0.98 && inputDifference < 0.7)
+        {
+            speed -= ((speed * 0.1f) * (1f - difference));
+        }
+        if (difference < 0.45 && inputDifference < 0.9)
+        {
+            speed -= ((speed * 0.3f) * (1f - difference));
+        }
+        if (speed < 0)
+            speed = 0;
+        turn = true;
+    }
+
+    void ApplyGravity()
+    {
+        gravity = isWallRunning ? wallRunGravity : isClimbing ? 0f : normalGravity;
+        if (!isGrounded)
+            Yvelocity.y += gravity * Time.deltaTime;
+        controller.Move(Yvelocity * Time.deltaTime);
+    }
+
+
+    // Wallrunning 
+
+    void CheckWallRun()
+    {
+        onRightWall = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallDistance, groundMask);
+        onLeftWall = Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallDistance, groundMask);
+
+        if ((onRightWall && Vector3.Dot(transform.right, input.normalized) > wallInputDifference.value || onLeftWall && Vector3.Dot(-transform.right, input.normalized) > wallInputDifference.value) && !isWallRunning && !isGrounded && !isSliding)
+        {
+            TestWallRun();
         }
 
-        move.x += input.x * airSpeedMultiplier;
-        move.z += input.z * airSpeedMultiplier;
-        move = Vector3.ClampMagnitude(move, speed);
+        if (!onRightWall && !onLeftWall && isWallRunning)
+        {
+            ExitWallRun();
+        }
+    }
+
+    void TestWallRun()
+    {
+        wallNormal = onRightWall ? rightWallHit.normal : leftWallHit.normal;
+
+        if (Vector3.Dot(wallNormal.normalized, Vector3.up) < -wallNormalDirection.value)
+        {
+            return;
+        }
+
+        if (hasWallRun)
+        {
+            float wallAngle = Vector3.Angle(wallNormal, lastWall);
+            if (wallAngle > 15)
+            {
+                WallRun();
+            }
+        }
+        else
+        {
+            hasWallRun = true;
+            WallRun();
+        }
+    }
+
+    void WallRun()
+    {
+        if (speed < 8)
+        {
+            desiredSpeed = 10;
+        }
+        else if (speed < 13)
+        {
+            desiredSpeed = speed + 2;
+        }
+        else
+        {
+            desiredSpeed = speed;
+        }
+
+        wallDistance = 2f;
+        isWallRunning = true;
+        jumpCharges = 1;
+        Yvelocity = new Vector3(0f, 0f, 0f);
+
+        forwardDirection = Vector3.Cross(wallNormal, Vector3.up);
+
+        if (Vector3.Dot(forwardDirection, transform.forward) < 0)
+        {
+            forwardDirection = -forwardDirection;
+        }
     }
 
     void WallRunMovement()
@@ -503,120 +549,6 @@ public class PilotMovement : NetworkBehaviour
         move = Vector3.ClampMagnitude(move, speed);
     }
 
-    void ClimbMovement()
-    {
-        if (Vector3.Dot(transform.forward, input.normalized) < wallInputDifference.value)
-        { 
-            hasClimbed = true;
-            Yvelocity.y = 1f;
-            isClimbing = false;
-        }
-
-        forwardDirection = Vector3.up;
-        move.x += input.x * airSpeedMultiplier;
-        move.z += input.z * airSpeedMultiplier;
-
-        Yvelocity += forwardDirection;
-        speed = climbSpeed;
-
-        move = Vector3.ClampMagnitude(move, speed);
-        Yvelocity = Vector3.ClampMagnitude(Yvelocity, speed);
-    }
-
-    void Crouch()
-    {
-        controller.height = crouchHeight;
-        controller.center = crouchingCenter;
-        groundCheck.position += new Vector3(0f, 1f, 0f);
-        body.transform.localScale = new Vector3(body.transform.localScale.x, crouchHeight, transform.localScale.z);
-        if (speed > 8 || !isGrounded)
-        {
-            isSliding = true;
-            isSprinting = false;
-            forwardDirection = input;
-            slideBoostWait = 2f;
-            if (isGrounded && canBoost)
-            {
-                IncreaseSpeed(slideSpeedIncrease);
-                slideFov = 95f;
-                canBoost = false;
-            }
-            else
-            {
-                slideFov = 92f;
-            }
-            slideTimer = maxSlideTimer;
-        }
-        isCrouching = true;
-    }
-
-    void SlideBoost()
-    {
-        if (!canBoost)
-            slideBoostWait -= 1f * Time.deltaTime;
-        if (slideBoostWait < 0)
-            canBoost = true;
-    }
-
-    void ExitCrouch()
-    {
-        controller.height = (startHeight * 2);
-        controller.center = standingCenter;
-        groundCheck.position += new Vector3(0f, -1f, 0f);
-        body.transform.localScale = new Vector3(body.transform.localScale.x, startHeight, transform.localScale.z);
-        isCrouching = false;
-        isSliding = false;
-    }
-
-    void TestWallRun()
-    {
-        wallNormal = onRightWall ? rightWallHit.normal : leftWallHit.normal;
-
-        if (Vector3.Dot(wallNormal.normalized, Vector3.up) < -wallNormalDirection.value)
-        {
-            return;
-        }
-
-        if (hasWallRun)
-        {
-            float wallAngle = Vector3.Angle(wallNormal, lastWall);
-            if (wallAngle > 15)
-            {
-                WallRun();
-            }
-        }
-        else
-        {
-            hasWallRun = true;
-            WallRun();
-        }
-    }
-
-    void WallRun()
-    {
-        if (speed < 8){
-        desiredSpeed = 10;
-        }
-        else if(speed <13){
-        desiredSpeed = speed+2;
-        }
-        else{
-        desiredSpeed = speed;
-        }
-
-        wallDistance = 2f;
-        isWallRunning = true;
-        jumpCharges = 1;
-        Yvelocity = new Vector3(0f, 0f, 0f);
-
-        forwardDirection = Vector3.Cross(wallNormal, Vector3.up);
-
-        if (Vector3.Dot(forwardDirection, transform.forward) < 0)
-        {
-            forwardDirection = -forwardDirection;
-        }
-    }
-
     void ExitWallRun()
     {
         isWallRunning = false;
@@ -629,73 +561,168 @@ public class PilotMovement : NetworkBehaviour
     }
 
 
-    void Jump()
+    //Crouching/Slideing
+
+    void Crouch()
     {
-        if (!isGrounded && !isWallRunning)
+        controller.height = crouchHeight;
+        controller.center = crouchingCenter;
+        groundCheck.position += new Vector3(0f, 1f, 0f);
+        body.transform.localScale = new Vector3(body.transform.localScale.x, crouchHeight, transform.localScale.z);
+        if (speed > 8 || !isGrounded)
         {
-            jumpCharges -= 1;
-            if (Vector3.Dot(transform.forward, jumpForward) > boostInputDifference.value)
+            isSliding = true;
+            isSprinting = false;
+            if (isGrounded && canBoost)
             {
-                IncreaseSpeed(1.2f);
+                IncreaseSpeed(slideSpeedIncrease);
+                slideFov = 95f;
+                StartCoroutine(SlideBoostCooldown());
+            }
+            else
+            {
+                slideFov = 92f;
+            }
+            slideTimer = maxSlideTimer;
+        }
+        isCrouching = true;
+    }
+
+    IEnumerator SlideBoostCooldown()
+    {
+        canBoost = false;
+        yield return new WaitForSeconds(2f);
+        canBoost = true;
+    }
+
+    void SlideMovement()
+    {
+        if (Physics.Raycast(transform.position, Vector3.down, out groundHit, 2.2f, groundMask))
+        {
+            Vector3 normal = groundHit.normal.normalized;
+
+            float difference = ((Vector3.Dot(normal, transform.forward) * -1) + 1);
+
+            friction = 7f * difference;
+        }
+
+        move.x += input.x * airSpeedMultiplier;
+        move.z += input.z * airSpeedMultiplier;
+        move = Vector3.ClampMagnitude(move, speed);
+
+        slideTimer -= 1f * Time.deltaTime;
+        if (slideTimer <= 0)
+        {
+            isSliding = false;
+        }
+    }
+
+    void CheckGroundBoost()
+    {
+        if (isGrounded && isSliding && (Vector3.Dot(-transform.right, input.normalized) > boostInputDifference.value || Vector3.Dot(transform.right, input.normalized) > boostInputDifference.value) && groundBoost == true)
+        {
+            speed += 0.65f;
+            groundBoost = false;
+            StartCoroutine(BoostCooldown());
+        }
+    }
+
+    IEnumerator BoostCooldown()
+    {
+        yield return new WaitForSeconds(3f);
+        groundBoost = true;
+    }
+
+    void ExitCrouch()
+    {
+        controller.height = (startHeight * 2);
+        controller.center = standingCenter;
+        groundCheck.position += new Vector3(0f, -1f, 0f);
+        body.transform.localScale = new Vector3(body.transform.localScale.x, startHeight, transform.localScale.z);
+        isCrouching = false;
+        isSliding = false;
+    }
+
+
+    // Climbing
+
+    void CheckClimbing()
+    {
+        canClimb = Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask);
+        if (Vector3.Dot(wallHit.normal.normalized, Vector3.up) < -wallNormalDirection.value || Vector3.Dot(wallHit.normal.normalized, Vector3.up) > wallNormalDirection.value)
+        {
+            return;
+        }
+
+        float wallAngle = Vector3.Angle(-wallHit.normal, transform.forward);
+        if (wallAngle < 15 && canClimb && !hasClimbed && Vector3.Dot(transform.forward, input.normalized) > wallInputDifference.value)
+        {
+            isClimbing = true;
+        }
+        else
+        {
+            isClimbing = false;
+        }
+    }
+
+    void ClimbMovement()
+    {
+        forwardDirection = Vector3.up;
+        move.x += input.x * airSpeedMultiplier;
+        move.z += input.z * airSpeedMultiplier;
+
+        Yvelocity += forwardDirection;
+        speed = climbSpeed;
+
+        move = Vector3.ClampMagnitude(move, speed);
+        Yvelocity = Vector3.ClampMagnitude(Yvelocity, speed);
+
+        if (Vector3.Dot(transform.forward, input.normalized) < wallInputDifference.value)
+        {
+            hasClimbed = true;
+            Yvelocity.y = 1f;
+            isClimbing = false;
+        }
+
+        climbTimer -= 1f * Time.deltaTime;
+        if (climbTimer < 0)
+        {
+            if (Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask) && Physics.Raycast(climbCheck.transform.position, transform.forward, 4f, groundMask) == false)
+            {
+                climbTimer += 0.3f;
+                speed += 3f;
+            }
+            else
+            {
+                hasClimbed = true;
+                isClimbing = false;
             }
         }
-        else if (isWallRunning)
-        {
-            ExitWallRun();
-            jumpForward = transform.forward;
-        }
-        else if (isGrounded)
-        {
-            StartCoroutine(LurchTimer());
-            jumpForward = transform.forward;
-        }
-
-        hasClimbed = false;
-        climbTimer = maxClimbTimer;
-        jumpCooldown = 0.3f;
-        float currentJumpHeight = isCrouching ? jumpHeight * 0.8f : jumpHeight;
-        Yvelocity.y = Mathf.Sqrt(currentJumpHeight * -2f * normalGravity);
     }
 
-    void ApplyGravity()
+
+    // Camera Effects
+
+    void CameraEffects()
     {
-        gravity = isWallRunning ? wallRunGravity : isClimbing ? 0f : normalGravity;
-        if (!isGrounded)
-            Yvelocity.y += gravity * Time.deltaTime;
-        controller.Move(Yvelocity * Time.deltaTime);
-    }
+        float fov = isWallRunning && !isGrounded ? specialFov : isSliding ? slideFov : normalFov;
+        playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, fov, cameraChangeTime * Time.deltaTime);
 
-    void SecondChanceJump()
-    {
-        if (!isGrounded && !isWallRunning)
-            inAir -= 1f * Time.deltaTime;
-        if (jumpAction.triggered && inAir > 0)
-            jumpCharges += 1;
-    }
-
-    IEnumerator TurningDecreasesSpeed()
-    {
-        oldForward = transform.forward;
-        oldForward = transform.TransformDirection(oldForward);
-
-        yield return new WaitForSeconds(0.1f);
-
-        newForward = transform.forward;
-        newForward = transform.TransformDirection(newForward);
-
-        float difference = Vector3.Dot(newForward, oldForward);
-        float inputDifference = Vector3.Dot(input, oldForward);
-
-        if (difference < 0.98 && inputDifference < 0.7)
+        if (isWallRunning)
         {
-            speed -= ((speed * 0.1f) * (1f - difference));
+            if (onRightWall && !isGrounded)
+            {
+                tilt = Mathf.Lerp(tilt, wallRunTilt, cameraChangeTime * Time.deltaTime);
+            }
+            else if (onLeftWall && !isGrounded)
+            {
+                tilt = Mathf.Lerp(tilt, -wallRunTilt, cameraChangeTime * Time.deltaTime);
+            }
         }
-        if (difference < 0.45 && inputDifference < 0.9)
+        else
         {
-            speed -= ((speed * 0.3f) * (1f - difference));
+            tilt = Mathf.Lerp(tilt, 0f, cameraChangeTime * Time.deltaTime);
         }
-        if (speed < 0)
-            speed = 0;
-        turn = true;
     }
+
 }
