@@ -11,7 +11,7 @@ public class AccesTitan : NetworkBehaviour
 
     GameObject[] titanDropPoints;
     float shortestDistance = 0f;
-    Transform chosenPoint;
+    Vector3 chosenPoint;
 
     private void Start()
     {
@@ -47,9 +47,11 @@ public class AccesTitan : NetworkBehaviour
 
             Camera pilotCamera = networkPlayerObject.GetComponentInChildren<Camera>();
 
-            if (Physics.Raycast(pilotCamera.transform.position, Vector3.forward, out RaycastHit raycastHit, 10, 3))
+            Vector3 direction = pilotCamera.transform.forward;
+
+            if (Physics.Raycast(pilotCamera.transform.position, direction, out RaycastHit hit))
             {
-                chosenPoint = raycastHit.transform;
+                chosenPoint = hit.point;
             }
             else
             {
@@ -59,14 +61,13 @@ public class AccesTitan : NetworkBehaviour
                     if (distance < shortestDistance || shortestDistance == 0f)
                     {
                         shortestDistance = distance;
-                        chosenPoint = titanDropPoints[i].transform;
+                        chosenPoint = titanDropPoints[i].transform.position;
                     }
                 }
     
             }
 
-            Vector3 spawnPosition = chosenPoint.position;
-            spawnPosition += new Vector3(0, 150, 0);
+            Vector3 spawnPosition = chosenPoint + new Vector3(0, 150, 0);
             NetworkObject networkPlayerTitanObject =
                 Runner.Spawn(_vanguardTitanPrefab, spawnPosition, Quaternion.identity,
                     Runner.LocalPlayer);
@@ -87,8 +88,7 @@ public class AccesTitan : NetworkBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        if (chosenPoint != null)
-            Gizmos.DrawSphere(chosenPoint.position, 5);
+        Gizmos.DrawSphere(chosenPoint, 5);
     }
     
     private void SetLayerRecrusivly(Transform parent)

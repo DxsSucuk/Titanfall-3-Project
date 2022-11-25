@@ -68,7 +68,7 @@ public class FireTitanRifle : NetworkBehaviour
         }
     }
 
-    [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
     private void ShootRPC()
     {
         readyToShoot = false;
