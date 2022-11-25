@@ -36,8 +36,6 @@ public class EnterVanguardTitan : NetworkBehaviour
     {
         controller = GetComponent<CharacterController>();
         rangeCheck = GetComponent<BoxCollider>();
- 
-        Rifle.SetActive(false);
     }
  
     public void StartFall()
@@ -70,6 +68,10 @@ public class EnterVanguardTitan : NetworkBehaviour
         if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkObject))
         {
             networkObject.gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("Could not find owning Object!");
         }
     }
  

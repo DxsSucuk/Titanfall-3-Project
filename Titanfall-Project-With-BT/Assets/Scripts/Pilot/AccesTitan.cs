@@ -1,7 +1,4 @@
 using Fusion;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class AccesTitan : NetworkBehaviour
@@ -43,19 +40,31 @@ public class AccesTitan : NetworkBehaviour
     {
         if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
         {
-            
-            for (int i = 0; i < titanDropPoints.Length; i++)
+
+            Camera pilotCamera = networkPlayerObject.GetComponentInChildren<Camera>();
+
+            if (Physics.Raycast(pilotCamera.transform.position, Vector3.forward, out RaycastHit raycastHit, 10, 3))
             {
-                float distance = Vector3.Distance(titanDropPoints[i].transform.position, this.transform.position);
-                if (distance < shortestDistance || shortestDistance == 0f)
+                chosenPoint = raycastHit.transform;
+            }
+            else
+            {
+                for (int i = 0; i < titanDropPoints.Length; i++)
                 {
-                    shortestDistance = distance;
-                    chosenPoint = titanDropPoints[i].transform;
+                    float distance = Vector3.Distance(titanDropPoints[i].transform.position, this.transform.position);
+                    if (distance < shortestDistance || shortestDistance == 0f)
+                    {
+                        shortestDistance = distance;
+                        chosenPoint = titanDropPoints[i].transform;
+                    }
                 }
+    
             }
 
+            Vector3 spawnPosition = chosenPoint.position;
+            spawnPosition += new Vector3(0, 150, 0);
             NetworkObject networkPlayerTitanObject =
-                Runner.Spawn(_vanguardTitanPrefab, chosenPoint.transform.position, Quaternion.identity,
+                Runner.Spawn(_vanguardTitanPrefab, spawnPosition, Quaternion.identity,
                     Runner.LocalPlayer);
             networkPlayerTitanObject.gameObject.layer = 6;
             SetLayerRecrusivly(networkPlayerTitanObject.transform);
@@ -65,12 +74,18 @@ public class AccesTitan : NetworkBehaviour
 
             enterVanguardTitan.player = networkPlayerObject.gameObject;
 
-            enterVanguardTitan.playerCamera = enterVanguardTitan.player.GetComponentInChildren<Camera>().gameObject;
+            enterVanguardTitan.playerCamera = pilotCamera.gameObject;
 
             TitanScript = enterVanguardTitan;
         }
     }
 
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(chosenPoint.position, 5);
+    }
+    
     private void SetLayerRecrusivly(Transform parent)
     {
         foreach (Transform child in parent)
