@@ -1,6 +1,7 @@
 using Fusion;
 using System.Collections;
 using System.Collections.Generic;
+using Networking.Inputs;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,8 +10,6 @@ public class VanguardMovement : NetworkBehaviour
     CharacterController controller;
 
     public PlayerInput controls;
-    public InputAction dashAction;
-
     public Transform groundCheck;
 
     public LayerMask groundMask;
@@ -18,9 +17,7 @@ public class VanguardMovement : NetworkBehaviour
     public Animator titanAnimator;
 
     bool isRunning;
-    bool shouldWalk;
     public bool isWalking;
-    bool shouldSprint;
     public bool isSprinting;
     public bool isDashing;
     bool isGrounded;
@@ -36,8 +33,9 @@ public class VanguardMovement : NetworkBehaviour
     Vector3 move;
     Vector3 forwardDirection;
     Vector3 Yvelocity;
-    Vector2 moveData;
 
+    NetworkTitanInput _networkTitanInput;
+    
     EnterVanguardTitan enterScript;
 
     // Start is called before the first frame update
@@ -47,29 +45,12 @@ public class VanguardMovement : NetworkBehaviour
         enterScript = GetComponent<EnterVanguardTitan>();
 
         controls = GetComponent<PlayerInput>();
-        dashAction = controls.actions["Dash"];
-    }
-
-
-    public void OnMove(InputValue value)
-    {
-        moveData = value.Get<Vector2>();
-    }
-
-    public void OnSprint(InputValue value)
-    {
-        shouldSprint = value.isPressed;
-    }
-
-    public void OnWalk(InputValue value)
-    {
-        shouldWalk = value.isPressed;
     }
 
 
     void HandleInput()
     {
-        input = new Vector3(moveData.x, 0f, moveData.y);
+        input = new Vector3(_networkTitanInput.moveData.x, 0f, _networkTitanInput.moveData.y);
 
         titanAnimator.SetFloat("moveX", input.x, 0.1f, Time.deltaTime);
         titanAnimator.SetFloat("moveZ", input.z, 0.1f, Time.deltaTime);
@@ -77,36 +58,38 @@ public class VanguardMovement : NetworkBehaviour
         input = transform.TransformDirection(input);
         input = Vector3.ClampMagnitude(input, 1f);
 
-        if (shouldSprint && !isWalking)
+        if (_networkTitanInput.Buttons.IsSet(TitanButtons.Sprint) && !isWalking)
         {
             isSprinting = true;
         }
 
-        if (!shouldSprint)
+        if (!_networkTitanInput.Buttons.IsSet(TitanButtons.Sprint))
         {
             isSprinting = false;
         }
 
-        if (shouldWalk && !isSprinting)
+        if (_networkTitanInput.Buttons.IsSet(TitanButtons.Walk) && !isSprinting)
         {
             isWalking = true;
         }
 
-        if (!shouldWalk)
+        if (!_networkTitanInput.Buttons.IsSet(TitanButtons.Walk))
         {
             isWalking = false;
         }
 
-        if (dashAction.triggered && !isDashing)
+        if (_networkTitanInput.Buttons.IsSet(TitanButtons.Dash) && !isDashing)
         {
             StartCoroutine(HandleDash());
         }
     }
 
     // Update is called once per frame
-    void Update()
+    public override void FixedUpdateNetwork()
     {
         if (!HasInputAuthority) return;
+
+        GetInput<NetworkTitanInput>(out _networkTitanInput);
 
         if (enterScript != null && enterScript.inTitan)
         {

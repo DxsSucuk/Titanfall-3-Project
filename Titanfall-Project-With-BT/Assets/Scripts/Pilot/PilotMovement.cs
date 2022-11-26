@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
+using Networking.Inputs;
 
 public class PilotMovement : NetworkBehaviour
 {
@@ -27,10 +28,10 @@ public class PilotMovement : NetworkBehaviour
     [Header("Basic Movement")]
     Vector3 move;
     Vector3 input;
-    Vector2 moveData;
     Vector3 Yvelocity;
     Vector3 forwardDirection;
     Vector3 jumpForward;
+    NetworkPilotInput _networkPilotInput;
 
     float speed;
 
@@ -44,10 +45,8 @@ public class PilotMovement : NetworkBehaviour
     float gravity;
     public float normalGravity;
     public float wallRunGravity;
-
-    bool shouldSprint;
+    
     public bool isSprinting;
-    bool shouldCrouch;
     bool isCrouching;
     public bool isSliding;
     bool isWallRunning;
@@ -137,10 +136,12 @@ public class PilotMovement : NetworkBehaviour
         speed -= speedDecrease * Time.deltaTime;
     }
 
-    void Update()
+    public override void FixedUpdateNetwork()
     {
         if (!HasInputAuthority)
             return;
+
+        GetInput<NetworkPilotInput>(out _networkPilotInput);
         
         SecondChanceJump();
         HandleInput();
@@ -198,32 +199,17 @@ public class PilotMovement : NetworkBehaviour
 
     //Input
 
-    public void OnMove(InputValue value)
-    {
-        moveData = value.Get<Vector2>();
-    }
-
-    public void OnSprint(InputValue value)
-    {
-        shouldSprint = value.isPressed;
-    }
-
-    public void OnCrouch(InputValue value)
-    {
-        shouldCrouch = value.isPressed;
-    }
-
     void HandleInput()
     {
-        input = new Vector3(moveData.x, 0f, moveData.y);
+        input = new Vector3(_networkPilotInput.moveData.x, 0f, _networkPilotInput.moveData.y);
         input = transform.TransformDirection(input);
         input = Vector3.ClampMagnitude(input, 1f);
 
-        if (shouldCrouch && !isCrouching)
+        if (_networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && !isCrouching)
         {
             Crouch();
         }
-        else if (!shouldCrouch && isCrouching)
+        else if (!_networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && isCrouching)
         {
             ExitCrouch();
         }
@@ -233,16 +219,16 @@ public class PilotMovement : NetworkBehaviour
             Application.Quit();
         }
 
-        if (shouldSprint && isGrounded && !isCrouching && !isSliding)
+        if (_networkPilotInput.Buttons.IsSet(PilotButtons.Sprint) && isGrounded && !isCrouching && !isSliding)
         {
             isSprinting = true;
         }
-        else if (!shouldSprint)
+        else if (!_networkPilotInput.Buttons.IsSet(PilotButtons.Sprint))
         {
             isSprinting = false;
         }
 
-        if (jumpAction.triggered && jumpCharges > 0)
+        if (_networkPilotInput.Buttons.IsSet(PilotButtons.Jump) && jumpCharges > 0)
         {
             Invoke("Jump", jumpCooldown);
         }
