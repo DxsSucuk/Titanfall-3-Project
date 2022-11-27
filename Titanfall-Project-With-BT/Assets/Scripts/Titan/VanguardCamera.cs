@@ -59,12 +59,7 @@ public class VanguardCamera : NetworkBehaviour
         }
     }
 
-    public void OnLook(InputValue value)
-    {
-        look = value.Get<Vector2>() * sensitivity;
-    }
-
-    void Update()
+    public override void FixedUpdateNetwork()
     {
         if (!HasInputAuthority)
         {
@@ -77,8 +72,9 @@ public class VanguardCamera : NetworkBehaviour
             if (enterScript.inTitan)
             {
 
-                RotY += look.x;
-                RotX += look.y;
+                Vector2 lookWithSens = moveScript.networkTitanInput.look * sensitivity;;
+                RotY += lookWithSens.x;
+                RotX += lookWithSens.y;
 
                 RotX = Mathf.Clamp(RotX, minX, maxX);
 

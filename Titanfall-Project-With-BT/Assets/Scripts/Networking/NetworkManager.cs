@@ -7,13 +7,16 @@ using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    NetworkRunner _runner;
+    public NetworkRunner _runner;
 
     [SerializeField] private NetworkPrefabRef _playerPrefab;
 
     public Transform spawnA;
     public Transform spawnB;
 
+    public GameObject pilotMovementManager;
+    public GameObject titanMovementManager;
+    
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
     async void StartGame(GameMode gameMode)
@@ -28,6 +31,9 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             Scene = SceneManager.GetActiveScene().buildIndex,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
         });
+        
+        pilotMovementManager.SetActive(true);
+        //// titanMovementManager.SetActive(true);
     }
 
     private void OnGUI()

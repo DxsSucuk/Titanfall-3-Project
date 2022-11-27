@@ -7,17 +7,16 @@ using Networking.Inputs;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class NetworkTitanInputProvider : SimulationBehaviour, INetworkRunnerCallbacks
+public class NetworkPilotInputProvider : SimulationBehaviour, INetworkRunnerCallbacks
 {
     public PlayerInput playerInput;
     public NetworkManager NetworkManager;
 
+    bool shouldCrouch;
+    bool shouldSprint;
     Vector2 moveData;
     Vector2 look;
-    bool shouldSprint;
-    bool shouldWalk;
-    bool canShoot;
-    
+
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
@@ -49,21 +48,16 @@ public class NetworkTitanInputProvider : SimulationBehaviour, INetworkRunnerCall
         shouldSprint = value.isPressed;
     }
 
-    public void OnWalk(InputValue value)
+    public void OnCrouch(InputValue value)
     {
-        shouldWalk = value.isPressed;
+        shouldCrouch = value.isPressed;
     }
-
+    
     public void OnLook(InputValue value)
     {
         look = value.Get<Vector2>();
     }
-    
-    public void OnFire(InputValue value)
-    {
-        canShoot = value.isPressed;
-    }
-    
+
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         // NOT NEEDED BUT FORCED TO SINCE INTERFACE IMPLEMENTATION!
@@ -76,18 +70,16 @@ public class NetworkTitanInputProvider : SimulationBehaviour, INetworkRunnerCall
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        NetworkTitanInput networkTitanInput = new NetworkTitanInput();
+        NetworkPilotInput networkPilotInput = new NetworkPilotInput();
 
-        networkTitanInput.Buttons.Set(TitanButtons.Sprint, shouldSprint);
-        networkTitanInput.Buttons.Set(TitanButtons.Walk, shouldWalk);
-        networkTitanInput.Buttons.Set(TitanButtons.Dash, playerInput.actions["Dash"].triggered);
-        networkTitanInput.Buttons.Set(TitanButtons.Reload, playerInput.actions["Reload"].triggered);
-        networkTitanInput.Buttons.Set(TitanButtons.Shoot, canShoot);
+        networkPilotInput.Buttons.Set(PilotButtons.Sprint, shouldSprint);
+        networkPilotInput.Buttons.Set(PilotButtons.Crouch, shouldCrouch);
+        networkPilotInput.Buttons.Set(PilotButtons.Jump, playerInput.actions["Jump"].triggered);
 
-        networkTitanInput.moveData = moveData;
-        networkTitanInput.look = look;
+        networkPilotInput.look = look;
+        networkPilotInput.moveData = moveData;
 
-        input.Set(networkTitanInput);
+        input.Set(networkPilotInput);
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)

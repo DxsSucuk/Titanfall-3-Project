@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Fusion;
+using Networking.Inputs;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,8 +19,7 @@ public class FireTitanRifle : NetworkBehaviour
     public ParticleSystem muzzleFlash;
     public ParticleSystem muzzleFlashSecondRifle;
     public GameObject impactEffect;
-
-    bool canShoot;
+    
     bool readyToShoot = true;
     bool isReloading;
 
@@ -30,35 +30,28 @@ public class FireTitanRifle : NetworkBehaviour
     int bulletsShot;
 
     public PlayerInput controls;
-    public InputAction reloadAction;
 
     private void Start()
     {
         controls = GetComponent<PlayerInput>();
-        reloadAction = controls.actions["Reload"];
     }
 
     void HandleInput()
     {
 
-        if (readyToShoot && canShoot && bulletsLeft > 0 && !isReloading)
+        if (readyToShoot && moveScript.networkTitanInput.Buttons.IsSet(TitanButtons.Shoot) && bulletsLeft > 0 && !isReloading)
         {
             bulletsShot = bulletsPerTap;
             ShootRPC();
         }
 
-        if (reloadAction.triggered && bulletsLeft < 500 && !moveScript.isDashing)
+        if (moveScript.networkTitanInput.Buttons.IsSet(TitanButtons.Reload) && bulletsLeft < 500 && !moveScript.isDashing)
         {
             StartCoroutine(Reload());
         }
     }
 
-    public void OnFire(InputValue value)
-    {
-        canShoot = value.isPressed;
-    }
-
-    void Update()
+    public override void FixedUpdateNetwork()
     {
         if (!HasInputAuthority) return;
         

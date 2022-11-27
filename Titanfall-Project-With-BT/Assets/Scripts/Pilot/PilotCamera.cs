@@ -11,8 +11,7 @@ public class PilotCamera : NetworkBehaviour
 
     public float sensitivity;
     public Camera cam;
-
-    Vector2 look;
+    
     float rotY = 0f;
     float rotX = 0f;
 
@@ -44,15 +43,13 @@ public class PilotCamera : NetworkBehaviour
         defaultY = cam.transform.localPosition.y;
     }
 
-    public void OnLook(InputValue value)
+    public override void FixedUpdateNetwork()
     {
-        look = value.Get<Vector2>()*sensitivity;
-    }
-
-    void Update()
-    {
-        rotY += look.x;
-        rotX += look.y;
+        if (move == null) return;
+        
+        Vector2 lookWithSens = move.networkPilotInput.look * sensitivity;;
+        rotY += lookWithSens.x;
+        rotX += lookWithSens.y;
 
         rotX = Mathf.Clamp(rotX, minX, maxX);
 

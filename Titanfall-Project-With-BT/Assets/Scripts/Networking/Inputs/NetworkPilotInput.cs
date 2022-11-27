@@ -12,8 +12,9 @@ namespace Networking.Inputs
 
     public struct NetworkPilotInput : INetworkInput
     {
-        public NetworkButtons Buttons { get; set; }
-
         public Vector2 moveData;
+        public Vector2 look;
+
+        public NetworkButtons Buttons { get; set; }
     }
 }

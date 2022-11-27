@@ -8,11 +8,9 @@ using Networking.Inputs;
 
 public class PilotMovement : NetworkBehaviour
 {
-    [Header("Player Components")]
-    CharacterController controller;
+    [Header("Player Components")] CharacterController controller;
 
     private PlayerInput controls;
-    private InputAction jumpAction;
 
     public Transform groundCheck;
 
@@ -25,13 +23,12 @@ public class PilotMovement : NetworkBehaviour
     public InputValues wallNormalDirection;
     public InputValues boostInputDifference;
 
-    [Header("Basic Movement")]
-    Vector3 move;
+    [Header("Basic Movement")] Vector3 move;
     Vector3 input;
     Vector3 Yvelocity;
     Vector3 forwardDirection;
     Vector3 jumpForward;
-    NetworkPilotInput _networkPilotInput;
+    public NetworkPilotInput networkPilotInput;
 
     float speed;
 
@@ -45,7 +42,7 @@ public class PilotMovement : NetworkBehaviour
     float gravity;
     public float normalGravity;
     public float wallRunGravity;
-    
+
     public bool isSprinting;
     bool isCrouching;
     public bool isSliding;
@@ -53,14 +50,12 @@ public class PilotMovement : NetworkBehaviour
     public bool isGrounded;
     public bool isMoving;
 
-    [Header("Jump")]
-    public float jumpHeight;
+    [Header("Jump")] public float jumpHeight;
     float jumpCooldown = 0f;
     int jumpCharges;
     float inAir;
 
-    [Header("Crouch")]
-    float startHeight;
+    [Header("Crouch")] float startHeight;
     float crouchHeight = 0.5f;
     float slideTimer;
     bool canBoost = true;
@@ -68,13 +63,11 @@ public class PilotMovement : NetworkBehaviour
     Vector3 crouchingCenter = new Vector3(0, 0.5f, 0);
     Vector3 standingCenter = new Vector3(0, 0, 0);
 
-    [Header("Slide")]
-    float friction;
+    [Header("Slide")] float friction;
     RaycastHit groundHit;
     public float slideSpeedIncrease;
 
-    [Header("Wallrun")]
-    bool onLeftWall;
+    [Header("Wallrun")] bool onLeftWall;
     bool onRightWall;
     bool hasWallRun = false;
     private RaycastHit leftWallHit;
@@ -83,32 +76,27 @@ public class PilotMovement : NetworkBehaviour
     Vector3 lastWall;
     float wallDistance = 1f;
 
-    [Header("Climbing")]
-    bool isClimbing;
+    [Header("Climbing")] bool isClimbing;
     bool hasClimbed;
     bool canClimb;
     private RaycastHit wallHit;
     float climbTimer;
     public float maxClimbTimer;
 
-    [Header("WallJumping")]
-    bool isWallJumping;
+    [Header("WallJumping")] bool isWallJumping;
     float wallJumpTimer;
     public float maxWallJumpTimer;
 
-    [Header("Lurch")]
-    float lurchTimer;
+    [Header("Lurch")] float lurchTimer;
     bool lurch;
     bool canLurch = true;
     bool groundBoost;
 
-    [Header("TurnInAir")]
-    Vector3 oldForward;
+    [Header("TurnInAir")] Vector3 oldForward;
     Vector3 newForward;
     bool turn = true;
 
-    [Header("Camera Effects")]
-    public Camera playerCamera;
+    [Header("Camera Effects")] public Camera playerCamera;
     float normalFov;
     public float specialFov;
     float slideFov;
@@ -120,10 +108,9 @@ public class PilotMovement : NetworkBehaviour
     {
         controller = GetComponent<CharacterController>();
         startHeight = transform.localScale.y;
-        normalFov = playerCamera.fieldOfView;
+        normalFov = 120;
 
         controls = GetComponent<PlayerInput>();
-        jumpAction = controls.actions["Jump"];
     }
 
     void IncreaseSpeed(float speedIncrease)
@@ -138,11 +125,14 @@ public class PilotMovement : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
+        GetInput(out networkPilotInput);
+    }
+
+    void Update()
+    {
         if (!HasInputAuthority)
             return;
 
-        GetInput<NetworkPilotInput>(out _networkPilotInput);
-        
         SecondChanceJump();
         HandleInput();
 
@@ -167,7 +157,8 @@ public class PilotMovement : NetworkBehaviour
             AirMovement();
         }
 
-        controller.Move(move * Time.deltaTime);
+        if (controller != null)
+            controller.Move(move * Time.deltaTime);
         ApplyGravity();
         CameraEffects();
     }
@@ -201,15 +192,16 @@ public class PilotMovement : NetworkBehaviour
 
     void HandleInput()
     {
-        input = new Vector3(_networkPilotInput.moveData.x, 0f, _networkPilotInput.moveData.y);
+        Vector2 moveData = networkPilotInput.moveData.normalized;
+        input = new Vector3(moveData.x, 0f, moveData.y);
         input = transform.TransformDirection(input);
         input = Vector3.ClampMagnitude(input, 1f);
 
-        if (_networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && !isCrouching)
+        if (networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && !isCrouching)
         {
             Crouch();
         }
-        else if (!_networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && isCrouching)
+        else if (!networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && isCrouching)
         {
             ExitCrouch();
         }
@@ -219,16 +211,16 @@ public class PilotMovement : NetworkBehaviour
             Application.Quit();
         }
 
-        if (_networkPilotInput.Buttons.IsSet(PilotButtons.Sprint) && isGrounded && !isCrouching && !isSliding)
+        if (networkPilotInput.Buttons.IsSet(PilotButtons.Sprint) && isGrounded && !isCrouching && !isSliding)
         {
             isSprinting = true;
         }
-        else if (!_networkPilotInput.Buttons.IsSet(PilotButtons.Sprint))
-        {
+        else if (!networkPilotInput.Buttons.IsSet(PilotButtons.Sprint))
+        {   
             isSprinting = false;
         }
 
-        if (_networkPilotInput.Buttons.IsSet(PilotButtons.Jump) && jumpCharges > 0)
+        if (networkPilotInput.Buttons.IsSet(PilotButtons.Jump) && jumpCharges > 0)
         {
             Invoke("Jump", jumpCooldown);
         }
@@ -282,6 +274,7 @@ public class PilotMovement : NetworkBehaviour
         {
             move.x = 0;
         }
+
         if (input.z != 0)
         {
             move.z += input.z * speed;
@@ -329,13 +322,15 @@ public class PilotMovement : NetworkBehaviour
     {
         if (!isGrounded && !isWallRunning)
             inAir -= 1f * Time.deltaTime;
-        if (jumpAction.triggered && inAir > 0)
+        if (networkPilotInput.Buttons.IsSet(PilotButtons.Jump) && inAir > 0)
             jumpCharges += 1;
     }
 
     void CheckLurch()
     {
-        if (!isGrounded && !isWallJumping && (Vector3.Dot(-transform.right, input.normalized) > 0.4 || Vector3.Dot(transform.right, input.normalized) > 0.4) && canLurch == true)
+        if (!isGrounded && !isWallJumping &&
+            (Vector3.Dot(-transform.right, input.normalized) > 0.4 ||
+             Vector3.Dot(transform.right, input.normalized) > 0.4) && canLurch == true)
         {
             speed -= 1f;
             forwardDirection = input;
@@ -364,6 +359,7 @@ public class PilotMovement : NetworkBehaviour
             move.x += input.x * airSpeedMultiplier;
             move.z += input.z * airSpeedMultiplier;
         }
+
         if (isWallJumping)
         {
             move += forwardDirection * airSpeedMultiplier;
@@ -373,6 +369,7 @@ public class PilotMovement : NetworkBehaviour
                 isWallJumping = false;
             }
         }
+
         if (lurch)
         {
             move += forwardDirection;
@@ -412,10 +409,12 @@ public class PilotMovement : NetworkBehaviour
         {
             speed -= ((speed * 0.1f) * (1f - difference));
         }
+
         if (difference < 0.45 && inputDifference < 0.9)
         {
             speed -= ((speed * 0.3f) * (1f - difference));
         }
+
         if (speed < 0)
             speed = 0;
         turn = true;
@@ -426,7 +425,8 @@ public class PilotMovement : NetworkBehaviour
         gravity = isWallRunning ? wallRunGravity : isClimbing ? 0f : normalGravity;
         if (!isGrounded)
             Yvelocity.y += gravity * Time.deltaTime;
-        controller.Move(Yvelocity * Time.deltaTime);
+        if (controller != null)
+            controller.Move(Yvelocity * Time.deltaTime);
     }
 
 
@@ -437,7 +437,9 @@ public class PilotMovement : NetworkBehaviour
         onRightWall = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallDistance, groundMask);
         onLeftWall = Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallDistance, groundMask);
 
-        if ((onRightWall && Vector3.Dot(transform.right, input.normalized) > wallInputDifference.value || onLeftWall && Vector3.Dot(-transform.right, input.normalized) > wallInputDifference.value) && !isWallRunning && !isGrounded && !isSliding)
+        if ((onRightWall && Vector3.Dot(transform.right, input.normalized) > wallInputDifference.value ||
+             onLeftWall && Vector3.Dot(-transform.right, input.normalized) > wallInputDifference.value) &&
+            !isWallRunning && !isGrounded && !isSliding)
         {
             TestWallRun();
         }
@@ -502,7 +504,6 @@ public class PilotMovement : NetworkBehaviour
 
     void WallRunMovement()
     {
-
         wallNormal = onRightWall ? rightWallHit.normal : leftWallHit.normal;
 
         forwardDirection = Vector3.Cross(wallNormal, Vector3.up);
@@ -566,8 +567,10 @@ public class PilotMovement : NetworkBehaviour
             {
                 slideFov = 92f;
             }
+
             slideTimer = maxSlideTimer;
         }
+
         isCrouching = true;
     }
 
@@ -602,7 +605,9 @@ public class PilotMovement : NetworkBehaviour
 
     void CheckGroundBoost()
     {
-        if (isGrounded && isSliding && (Vector3.Dot(-transform.right, input.normalized) > boostInputDifference.value || Vector3.Dot(transform.right, input.normalized) > boostInputDifference.value) && groundBoost == true)
+        if (isGrounded && isSliding &&
+            (Vector3.Dot(-transform.right, input.normalized) > boostInputDifference.value ||
+             Vector3.Dot(transform.right, input.normalized) > boostInputDifference.value) && groundBoost == true)
         {
             speed += 0.65f;
             groundBoost = false;
@@ -632,13 +637,15 @@ public class PilotMovement : NetworkBehaviour
     void CheckClimbing()
     {
         canClimb = Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask);
-        if (Vector3.Dot(wallHit.normal.normalized, Vector3.up) < -wallNormalDirection.value || Vector3.Dot(wallHit.normal.normalized, Vector3.up) > wallNormalDirection.value)
+        if (Vector3.Dot(wallHit.normal.normalized, Vector3.up) < -wallNormalDirection.value ||
+            Vector3.Dot(wallHit.normal.normalized, Vector3.up) > wallNormalDirection.value)
         {
             return;
         }
 
         float wallAngle = Vector3.Angle(-wallHit.normal, transform.forward);
-        if (wallAngle < 15 && canClimb && !hasClimbed && Vector3.Dot(transform.forward, input.normalized) > wallInputDifference.value)
+        if (wallAngle < 15 && canClimb && !hasClimbed &&
+            Vector3.Dot(transform.forward, input.normalized) > wallInputDifference.value)
         {
             isClimbing = true;
         }
@@ -670,7 +677,8 @@ public class PilotMovement : NetworkBehaviour
         climbTimer -= 1f * Time.deltaTime;
         if (climbTimer < 0)
         {
-            if (Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask) && Physics.Raycast(climbCheck.transform.position, transform.forward, 4f, groundMask) == false)
+            if (Physics.Raycast(transform.position, transform.forward, out wallHit, 1f, groundMask) &&
+                Physics.Raycast(climbCheck.transform.position, transform.forward, 4f, groundMask) == false)
             {
                 climbTimer += 0.3f;
                 speed += 3f;
@@ -689,7 +697,8 @@ public class PilotMovement : NetworkBehaviour
     void CameraEffects()
     {
         float fov = isWallRunning && !isGrounded ? specialFov : isSliding ? slideFov : normalFov;
-        playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, fov, cameraChangeTime * Time.deltaTime);
+        float newFov = Mathf.Lerp(playerCamera.fieldOfView, fov, cameraChangeTime * Time.deltaTime);
+        playerCamera.fieldOfView = newFov < normalFov ? normalFov : newFov;
 
         if (isWallRunning)
         {
@@ -707,5 +716,4 @@ public class PilotMovement : NetworkBehaviour
             tilt = Mathf.Lerp(tilt, 0f, cameraChangeTime * Time.deltaTime);
         }
     }
-
 }

@@ -34,7 +34,7 @@ public class VanguardMovement : NetworkBehaviour
     Vector3 forwardDirection;
     Vector3 Yvelocity;
 
-    NetworkTitanInput _networkTitanInput;
+    public NetworkTitanInput networkTitanInput;
     
     EnterVanguardTitan enterScript;
 
@@ -50,7 +50,8 @@ public class VanguardMovement : NetworkBehaviour
 
     void HandleInput()
     {
-        input = new Vector3(_networkTitanInput.moveData.x, 0f, _networkTitanInput.moveData.y);
+        Vector2 moveData = networkTitanInput.moveData.normalized;
+        input = new Vector3(moveData.x, 0f, moveData.y);
 
         titanAnimator.SetFloat("moveX", input.x, 0.1f, Time.deltaTime);
         titanAnimator.SetFloat("moveZ", input.z, 0.1f, Time.deltaTime);
@@ -58,38 +59,41 @@ public class VanguardMovement : NetworkBehaviour
         input = transform.TransformDirection(input);
         input = Vector3.ClampMagnitude(input, 1f);
 
-        if (_networkTitanInput.Buttons.IsSet(TitanButtons.Sprint) && !isWalking)
+        if (networkTitanInput.Buttons.IsSet(TitanButtons.Sprint) && !isWalking)
         {
             isSprinting = true;
         }
 
-        if (!_networkTitanInput.Buttons.IsSet(TitanButtons.Sprint))
+        if (!networkTitanInput.Buttons.IsSet(TitanButtons.Sprint))
         {
             isSprinting = false;
         }
 
-        if (_networkTitanInput.Buttons.IsSet(TitanButtons.Walk) && !isSprinting)
+        if (networkTitanInput.Buttons.IsSet(TitanButtons.Walk) && !isSprinting)
         {
             isWalking = true;
         }
 
-        if (!_networkTitanInput.Buttons.IsSet(TitanButtons.Walk))
+        if (!networkTitanInput.Buttons.IsSet(TitanButtons.Walk))
         {
             isWalking = false;
         }
 
-        if (_networkTitanInput.Buttons.IsSet(TitanButtons.Dash) && !isDashing)
+        if (networkTitanInput.Buttons.IsSet(TitanButtons.Dash) && !isDashing)
         {
             StartCoroutine(HandleDash());
         }
     }
 
-    // Update is called once per frame
     public override void FixedUpdateNetwork()
     {
-        if (!HasInputAuthority) return;
+        GetInput<NetworkTitanInput>(out networkTitanInput); 
+    }
 
-        GetInput<NetworkTitanInput>(out _networkTitanInput);
+    // Update is called once per frame
+    void Update()
+    {
+        if (!HasInputAuthority) return;
 
         if (enterScript != null && enterScript.inTitan)
         {

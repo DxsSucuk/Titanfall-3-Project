@@ -53,7 +53,7 @@ public class EnterVanguardTitan : NetworkBehaviour
         }
     }
     
-    [Rpc]
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
     private void Player_HideRPC()
     {
         if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkObject))
@@ -62,7 +62,7 @@ public class EnterVanguardTitan : NetworkBehaviour
         }
     }
     
-    [Rpc]
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
     private void Player_ShowRPC()
     {
         if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkObject))
