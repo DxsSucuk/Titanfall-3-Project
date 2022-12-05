@@ -38,6 +38,21 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         //// titanMovementManager.SetActive(true);
     }
 
+    private void OnGUI()
+    {
+        if (_runner != null) return;
+        
+        if (GUI.Button(new Rect(0, 0, 200, 40), "Create"))
+        {
+            StartGame(GameMode.Host);
+        }
+
+        if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
+        {
+            StartGame(GameMode.Client);
+        }
+    }
+
     public void PlayerSingleplayer()
     {
         StartGame(GameMode.Single);
