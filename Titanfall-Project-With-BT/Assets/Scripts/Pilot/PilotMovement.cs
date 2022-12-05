@@ -130,8 +130,8 @@ public class PilotMovement : NetworkBehaviour
 
     void Update()
     {
-        if (!HasInputAuthority)
-            return;
+        /*if (!HasInputAuthority)
+            return;*/
 
         SecondChanceJump();
         HandleInput();

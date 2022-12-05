@@ -6,7 +6,8 @@ The Multiplayer is still under heavy development and does not fully work.
 For the multiplayer we have used Photon Fusion to get a simple yet capable networking system
 
 Known Issues:
-* Player does not respawn after leaving Titan.
+* Movement actions do not work. (Networking Issue)
+* Other players can not move.
 
 # Credits
 Mainly developed by [Harald](https://www.youtube.com/@harald1)

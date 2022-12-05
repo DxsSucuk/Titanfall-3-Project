@@ -21,6 +21,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     async void StartGame(GameMode gameMode)
     {
+        if (_runner != null) return;
+        
         _runner = gameObject.AddComponent<NetworkRunner>();
         _runner.ProvideInput = true;
 
@@ -28,7 +30,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = gameMode,
             SessionName = "WeBallin",
-            Scene = SceneManager.GetActiveScene().buildIndex,
+            Scene = SceneManager.GetActiveScene().buildIndex + 1,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
         });
         
@@ -36,22 +38,29 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         //// titanMovementManager.SetActive(true);
     }
 
-    private void OnGUI()
+    public void PlayerSingleplayer()
     {
-        if (_runner == null)
-        {
-            if (GUI.Button(new Rect(0, 0, 200, 40), "Create"))
-            {
-                StartGame(GameMode.Host);
-            }
-            
-            if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
-            {
-                StartGame(GameMode.Client);
-            }
-        }
+        StartGame(GameMode.Single);
     }
-
+    
+    public void PlayMultiplayer()
+    {
+        //// TODO:: switch to client since we are going to use a dedicated server.
+        StartGame(GameMode.AutoHostOrClient);
+    }
+    
+    public void SwitchToTitanMovement()
+    {
+        pilotMovementManager.SetActive(false);
+        titanMovementManager.SetActive(true);
+    }
+    
+    public void SwitchToPilotMovement()
+    {
+        titanMovementManager.SetActive(false);
+        pilotMovementManager.SetActive(true);
+    }
+    
     public void OnConnectedToServer(NetworkRunner runner)
     {
         Debug.Log("Connected to Server -> " + runner.name);
@@ -97,16 +106,40 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log("Player joined Server -> " + player.PlayerId);
-        if (runner.LocalPlayer == player)
+        //// SpawnPlayer(runner, player);
+    }
+
+    private void SpawnPlayer(NetworkRunner runner, PlayerRef player)
+    {
+        if (runner.GameMode == GameMode.Shared || runner.GameMode == GameMode.Single)
         {
-            // Create a unique position for the player
-            Vector3 spawnPosition = spawnB.position;
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            if (runner.LocalPlayer == player)
+            {
+                // Create a unique position for the player
+                Vector3 spawnPosition = spawnB.position;
+                NetworkObject networkPlayerObject =
+                    runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
 
-            runner.SetPlayerObject(player, networkPlayerObject);
+                runner.SetPlayerObject(player, networkPlayerObject);
 
-            // Keep track of the player avatars so we can remove it when they disconnect
-            _spawnedCharacters.Add(player, networkPlayerObject);
+                // Keep track of the player avatars so we can remove it when they disconnect
+                _spawnedCharacters.Add(player, networkPlayerObject);
+            }
+        }
+        else
+        {
+            if (runner.IsServer)
+            {
+                // Create a unique position for the player
+                Vector3 spawnPosition = spawnB.position;
+                NetworkObject networkPlayerObject =
+                    runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+
+                runner.SetPlayerObject(player, networkPlayerObject);
+
+                // Keep track of the player avatars so we can remove it when they disconnect
+                _spawnedCharacters.Add(player, networkPlayerObject);
+            }
         }
     }
 
@@ -129,12 +162,12 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        // TODO:: for future menu screen.
+        SpawnPlayer(runner, runner.LocalPlayer);
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
     {
-        // TODO:: for future menu screen.
+        // TODO:: add Menu loading indicator.
     }
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)

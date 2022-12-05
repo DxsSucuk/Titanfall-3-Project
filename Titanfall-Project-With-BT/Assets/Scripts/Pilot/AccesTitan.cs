@@ -26,21 +26,22 @@ public class AccesTitan : NetworkBehaviour
 
     void StartTitanFall()
     {
-        if (!HasInputAuthority) return;
+        if (!HasStateAuthority) return;
 
         if (Input.GetKeyDown(KeyCode.V) && (TitanObject == null || !TitanObject.isActiveAndEnabled))
         {
             if (TitanObject != null)
                 Runner.Despawn(TitanObject);
             
-            SpawnToDropLocation();
+            SpawnToDropLocationRPC();
             
             if (TitanScript != null)
                 TitanScript.StartFall();
         }
     }
 
-    private void SpawnToDropLocation()
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    private void SpawnToDropLocationRPC()
     {
         if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
         {

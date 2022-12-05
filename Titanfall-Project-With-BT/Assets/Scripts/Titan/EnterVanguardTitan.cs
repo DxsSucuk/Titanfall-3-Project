@@ -77,6 +77,7 @@ public class EnterVanguardTitan : NetworkBehaviour
  
     public IEnumerator Embark()
     {
+        GameObject.FindWithTag("NetworkManager").GetComponent<NetworkManager>().SwitchToTitanMovement();
         playerCamera.SetActive(false);
         embarkTitanCamera.SetActive(true);
         rangeCheck.enabled = false;
@@ -113,6 +114,7 @@ public class EnterVanguardTitan : NetworkBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
+            GameObject.FindWithTag("NetworkManager").GetComponent<NetworkManager>().SwitchToPilotMovement();
             Player_ShowRPC();
             playerCamera.SetActive(true);
             titanCamera.SetActive(false);
