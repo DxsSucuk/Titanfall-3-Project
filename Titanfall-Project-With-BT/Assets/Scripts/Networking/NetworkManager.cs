@@ -11,13 +11,17 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     [SerializeField] private NetworkPrefabRef _playerPrefab;
 
-    public Transform spawnA;
-    public Transform spawnB;
+    private GameObject[] spawnPoints;
 
     public GameObject pilotMovementManager;
     public GameObject titanMovementManager;
     
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+    private void Awake()
+    {
+        spawnPoints = GameObject.FindGameObjectsWithTag("Respawn");
+    }
 
     async void StartGame(GameMode gameMode)
     {
@@ -30,10 +34,10 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             GameMode = gameMode,
             SessionName = "WeBallin",
-            Scene = SceneManager.GetActiveScene().buildIndex + 1,
+            Scene = SceneManager.GetActiveScene().buildIndex,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
         });
-        
+
         pilotMovementManager.SetActive(true);
         //// titanMovementManager.SetActive(true);
     }
@@ -120,8 +124,8 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
-        Debug.Log("Player joined Server -> " + player.PlayerId);
-        //// SpawnPlayer(runner, player);
+        Debug.Log("Player joined Server -> " + player.PlayerId); 
+        SpawnPlayer(runner, player);
     }
 
     private void SpawnPlayer(NetworkRunner runner, PlayerRef player)
@@ -131,7 +135,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             if (runner.LocalPlayer == player)
             {
                 // Create a unique position for the player
-                Vector3 spawnPosition = spawnB.position;
+                Vector3 spawnPosition = spawnPoints[new System.Random().Next(spawnPoints.Length - 1)].transform.position;
                 NetworkObject networkPlayerObject =
                     runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
 
@@ -146,7 +150,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
             if (runner.IsServer)
             {
                 // Create a unique position for the player
-                Vector3 spawnPosition = spawnB.position;
+                Vector3 spawnPosition = spawnPoints[new System.Random().Next(spawnPoints.Length - 1)].transform.position;
                 NetworkObject networkPlayerObject =
                     runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
 
@@ -177,7 +181,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        SpawnPlayer(runner, runner.LocalPlayer);
+        //// SpawnPlayer(runner, runner.LocalPlayer);
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
