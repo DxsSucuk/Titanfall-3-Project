@@ -258,7 +258,7 @@ GameObject:
   - component: {fileID: 2221782363576981722}
   - component: {fileID: 3894134462755980390}
   - component: {fileID: -3711079012651501327}
-  - component: {fileID: 2764054555789011450}
+  - component: {fileID: 7784344225902072648}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -344,7 +344,7 @@ MonoBehaviour:
   - {fileID: 4186822761668775030}
   - {fileID: 3894134462755980390}
   - {fileID: -3711079012651501327}
-  - {fileID: 2764054555789011450}
+  - {fileID: 7784344225902072648}
   SimulationBehaviours: []
 --- !u!114 &3894134462755980390
 MonoBehaviour:
@@ -410,7 +410,7 @@ MonoBehaviour:
   runBobSpeed: 13
   sprintBobAmount: 0.07
   runBobAmount: 0.03
---- !u!114 &2764054555789011450
+--- !u!114 &7784344225902072648
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -424,7 +424,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   InterpolationSpace: 0
-  InterpolationTarget: {fileID: 4186822761181016723}
+  InterpolationTarget: {fileID: 4186822761209185573}
   InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
