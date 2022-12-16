@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - TitanLandingZone
   - DropPoint
+  - Weapon
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -16,10 +18,10 @@ TagManager:
   - UI
   - BT-7274
   - Arms
-  - Wall
+  - Player
   - Titan Other
   - damageable
-  - 
+  - PrivatePlayer
   - 
   - 
   - 

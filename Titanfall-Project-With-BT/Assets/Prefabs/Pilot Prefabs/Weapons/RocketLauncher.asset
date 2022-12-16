@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07dbcfb6922faf8469e777257e9d7352, type: 3}
+  m_Name: RocketLauncher
+  m_EditorClassIdentifier: 
+  name: RocketLaunchers
+  type: AntiTitan
+  family: Launchers
+  Automatic: 0
+  hitscan: 0
+  damage: 0
+  range: 0
+  spread: 0
+  bulletsPerShot: 1
+  projectile: {fileID: 6312990473720342022, guid: c445bce48b6824e40ace3245e7cffe39, type: 3}
+  bulletVelocityForce: 100
+  ammoLeft: 1
+  magSize: 1
+  fireRate: 100
+  reloadTime: 4
+  isReloading: 0
+  recoilX: -8
+  recoilY: 8
+  recoilZ: 1.5
+  snappiness: 10
+  returnSpeed: 1
+  fireSound: {fileID: 8300000, guid: 141ec5a7b17544540ab2198c97512543, type: 3}
+  muzzleFlash: {fileID: 285066435499994897, guid: 5d7308b82b6b790459fc7ce1eb248b44, type: 3}
+  impactEffect: {fileID: 100002, guid: 720af6421c2b0404c9f1d93560a75c2b, type: 3}

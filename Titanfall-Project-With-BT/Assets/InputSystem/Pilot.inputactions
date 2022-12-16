@@ -898,7 +898,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "AnitTitan",
+                    "name": "AntiTitan",
                     "type": "Value",
                     "id": "eb614685-2359-49ba-8c3d-f3fa0747f311",
                     "expectedControlType": "",
@@ -1135,7 +1135,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "AnitTitan",
+                    "action": "AntiTitan",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

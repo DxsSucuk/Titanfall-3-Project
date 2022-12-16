@@ -4,11 +4,15 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
+using UnityEngine.Animations.Rigging;
 
 public class PilotMovement : NetworkBehaviour
 {
     [Header("Player Components")]
     CharacterController controller;
+
+    public Animator animator;
+    public Rig rig;
 
     private PlayerInput controls;
     private InputAction jumpAction;
@@ -183,6 +187,7 @@ public class PilotMovement : NetworkBehaviour
         CheckTurnInAir();
         CheckGroundBoost();
         CheckLurch();
+        HandleAnimations();
 
         if (!isMoving)
         {
@@ -219,6 +224,10 @@ public class PilotMovement : NetworkBehaviour
     void HandleInput()
     {
         input = new Vector3(moveData.x, 0f, moveData.y);
+
+        animator.SetFloat("moveX", input.x, 0.1f, Time.deltaTime);
+        animator.SetFloat("moveZ", input.z, 0.1f, Time.deltaTime);
+
         input = transform.TransformDirection(input);
         input = Vector3.ClampMagnitude(input, 1f);
 
@@ -236,7 +245,7 @@ public class PilotMovement : NetworkBehaviour
             Application.Quit();
         }
 
-        if (shouldSprint && isGrounded && !isCrouching && !isSliding)
+        if (shouldSprint && isGrounded && !isCrouching && !isSliding && Vector3.Dot(transform.forward, input) > 0.5)
         {
             isSprinting = true;
         }
@@ -284,6 +293,11 @@ public class PilotMovement : NetworkBehaviour
         else
         {
             isMoving = true;
+        }
+
+        if (isSprinting && Vector3.Dot(transform.forward, input) < 0.5)
+        {
+            isSprinting = false;
         }
     }
 
@@ -568,7 +582,7 @@ public class PilotMovement : NetworkBehaviour
         controller.height = crouchHeight;
         controller.center = crouchingCenter;
         groundCheck.position += new Vector3(0f, 1f, 0f);
-        body.transform.localScale = new Vector3(body.transform.localScale.x, crouchHeight, transform.localScale.z);
+        body.transform.position += new Vector3(0f, 1f, 0f);
         if (speed > 8 || !isGrounded)
         {
             isSliding = true;
@@ -638,7 +652,7 @@ public class PilotMovement : NetworkBehaviour
         controller.height = (startHeight * 2);
         controller.center = standingCenter;
         groundCheck.position += new Vector3(0f, -1f, 0f);
-        body.transform.localScale = new Vector3(body.transform.localScale.x, startHeight, transform.localScale.z);
+        body.transform.position += new Vector3(0f, -1f, 0f);
         isCrouching = false;
         isSliding = false;
     }
@@ -723,6 +737,24 @@ public class PilotMovement : NetworkBehaviour
         {
             tilt = Mathf.Lerp(tilt, 0f, cameraChangeTime * Time.deltaTime);
         }
+    }
+
+    void HandleAnimations()
+    {
+        animator.SetBool("isRunning", isGrounded && !isCrouching && !isSprinting && !isSliding);
+        animator.SetBool("isCrouching", isCrouching);
+        animator.SetBool("isSprinting", isSprinting);
+        animator.SetBool("isSliding", isSliding);
+
+        animator.SetBool("inAir", !isGrounded);
+        animator.SetBool("rightWall", isWallRunning && onRightWall);
+        animator.SetBool("leftWall", isWallRunning && onLeftWall);
+        animator.SetBool("isClimbing", isClimbing);
+
+        if (isSprinting || isClimbing)
+            rig.weight = 0;
+        else
+            rig.weight = 1;
     }
 
 }
