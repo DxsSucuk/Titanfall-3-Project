@@ -8,6 +8,10 @@ namespace Networking.Inputs
         Sprint = 1,
         Crouch = 2,
         Jump = 3,
+        Reload = 4,
+        Shoot = 5,
+        SwitchPrimary = 6,
+        SwitchSecondary = 7,
     }
 
     public struct NetworkPilotInput : INetworkInput

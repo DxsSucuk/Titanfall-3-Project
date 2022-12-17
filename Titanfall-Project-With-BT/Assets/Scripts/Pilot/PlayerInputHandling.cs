@@ -1,32 +1,24 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Networking.Inputs;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 public class PlayerInputHandling : MonoBehaviour
 {
-    public bool canShoot, shouldReload;
-    public int weapon;
-    public void OnFire(InputValue value)
-    {
-        canShoot = value.isPressed;
-    }
-    public void OnReload(InputValue value)
-    {
-        shouldReload = value.isPressed;
-    }
+    private PilotMovement PilotMovement;
 
-    public void OnPrimary()
-    {
-        weapon = 1;
-    }
-    public void OnSecondary()
-    {
-        weapon = 2;
-    }
-    /*public void OnAntiTitan()
-    {
-        weapon = 3;
-    }*/
+    public bool CanShoot => PilotMovement.networkPilotInput.Buttons.IsSet(PilotButtons.Shoot);
 
+    public bool ShouldReload => PilotMovement.networkPilotInput.Buttons.IsSet(PilotButtons.Reload);
+
+    public int Weapon => PilotMovement.networkPilotInput.Buttons.IsSet(PilotButtons.SwitchPrimary) ? 1 :
+            PilotMovement.networkPilotInput.Buttons.IsSet(PilotButtons.SwitchSecondary) ? 2 : 0;
+
+    private void Awake()
+    {
+        PilotMovement = GetComponent<PilotMovement>();
+    }
 }

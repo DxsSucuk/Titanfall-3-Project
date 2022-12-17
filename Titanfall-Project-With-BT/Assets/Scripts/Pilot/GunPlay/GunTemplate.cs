@@ -27,25 +27,25 @@ public class GunTemplate : MonoBehaviour
     {     
         if (gunValues.Automatic)
         {
-            if (inputHandling.canShoot)
+            if (inputHandling.CanShoot)
             {
                 Shoot();
             }
         }
         else
         {
-            if (!inputHandling.canShoot)
+            if (!inputHandling.CanShoot)
             {
                 alreadyShot = false;
             }
-            if (inputHandling.canShoot && alreadyShot == false)
+            if (inputHandling.CanShoot && alreadyShot == false)
             {
                 alreadyShot = true;
                 Shoot();
             }
         }
 
-        if (inputHandling.shouldReload && gunValues.ammoLeft < gunValues.magSize && !gunValues.isReloading)
+        if (inputHandling.ShouldReload && gunValues.ammoLeft < gunValues.magSize && !gunValues.isReloading)
         {
             StartCoroutine(Reload());
         }

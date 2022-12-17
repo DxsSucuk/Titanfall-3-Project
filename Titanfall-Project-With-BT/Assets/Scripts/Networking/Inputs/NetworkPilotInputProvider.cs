@@ -14,6 +14,11 @@ public class NetworkPilotInputProvider : SimulationBehaviour, INetworkRunnerCall
 
     bool shouldCrouch;
     bool shouldSprint;
+    bool canShoot;
+    bool shouldReload;
+    bool shouldSwitchPrimary;
+    bool shouldSwitchSecondary;
+    
     Vector2 moveData;
     Vector2 look;
 
@@ -57,6 +62,25 @@ public class NetworkPilotInputProvider : SimulationBehaviour, INetworkRunnerCall
     {
         look = value.Get<Vector2>();
     }
+    
+    public void OnFire(InputValue value)
+    {
+        canShoot = value.isPressed;
+    }
+    
+    public void OnReload(InputValue value)
+    {
+        shouldReload = value.isPressed;
+    }
+    
+    public void OnPrimary()
+    {
+        shouldSwitchPrimary = true;
+    }
+    public void OnSecondary()
+    {
+        shouldSwitchSecondary = true;
+    }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
@@ -75,6 +99,10 @@ public class NetworkPilotInputProvider : SimulationBehaviour, INetworkRunnerCall
         networkPilotInput.Buttons.Set(PilotButtons.Sprint, shouldSprint);
         networkPilotInput.Buttons.Set(PilotButtons.Crouch, shouldCrouch);
         networkPilotInput.Buttons.Set(PilotButtons.Jump, playerInput.actions["Jump"].triggered);
+        networkPilotInput.Buttons.Set(PilotButtons.Reload, shouldReload);
+        networkPilotInput.Buttons.Set(PilotButtons.Shoot, canShoot);
+        networkPilotInput.Buttons.Set(PilotButtons.SwitchPrimary, shouldSwitchPrimary);
+        networkPilotInput.Buttons.Set(PilotButtons.SwitchSecondary, shouldSwitchSecondary);
 
         networkPilotInput.look = look;
         networkPilotInput.moveData = moveData;

@@ -57,7 +57,7 @@ public class CameraControl : NetworkBehaviour
 
         rotX = Mathf.Clamp(rotX, minX, maxX);
 
-        PlayerMain.transform.localEulerAngles = new Vector3(0, rotY, 0);
+        transform.localEulerAngles = new Vector3(0, rotY, 0);
         cam.transform.localEulerAngles = new Vector3(-rotX, 0, move.tilt);
 
         HandleHeadBob();

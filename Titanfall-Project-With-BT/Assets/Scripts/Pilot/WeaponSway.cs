@@ -16,8 +16,7 @@ public class WeaponSway : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!HasInputAuthority) return;
-
+        if (!HasStateAuthority) return;
         SwayWeapon();
     }
 

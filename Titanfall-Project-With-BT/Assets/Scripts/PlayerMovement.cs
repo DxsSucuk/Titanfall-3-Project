@@ -48,7 +48,7 @@ public class PlayerMovement : NetworkBehaviour
 
     private void Update()
     {
-        if (!HasInputAuthority) return;
+        if (!HasStateAuthority) return;
         
         if (isAlive)
         {

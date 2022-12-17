@@ -127,7 +127,7 @@ public class EnterVanguardTitan : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!HasInputAuthority) return;
+        if (!HasStateAuthority) return;
         
         if (inTitan)
         {

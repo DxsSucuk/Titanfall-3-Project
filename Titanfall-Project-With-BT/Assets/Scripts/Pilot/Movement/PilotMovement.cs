@@ -130,8 +130,7 @@ public class PilotMovement : NetworkBehaviour
 
     void Update()
     {
-        /*if (!HasInputAuthority)
-            return;*/
+        if (!HasStateAuthority) return;
 
         SecondChanceJump();
         HandleInput();
@@ -158,7 +157,11 @@ public class PilotMovement : NetworkBehaviour
         }
 
         if (controller != null)
+        {
             controller.Move(move * Time.deltaTime);
+        }
+
+
         ApplyGravity();
         CameraEffects();
     }
@@ -199,7 +202,7 @@ public class PilotMovement : NetworkBehaviour
 
         if (networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && !isCrouching)
         {
-            Crouch();
+            //// Crouch();
         }
         else if (!networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && isCrouching)
         {
@@ -216,7 +219,7 @@ public class PilotMovement : NetworkBehaviour
             isSprinting = true;
         }
         else if (!networkPilotInput.Buttons.IsSet(PilotButtons.Sprint))
-        {   
+        {
             isSprinting = false;
         }
 
@@ -229,9 +232,15 @@ public class PilotMovement : NetworkBehaviour
 
     //Groundmovement
 
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(groundCheck.position, 0.2f);
+    }
+    
     void CheckGround()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, groundMask);
+        isGrounded = Physics.CheckSphere(groundCheck.position, 0.02f, groundMask);
         if (isGrounded)
         {
             inAir = 0.2f;
@@ -379,7 +388,7 @@ public class PilotMovement : NetworkBehaviour
                 lurch = false;
             }
         }
-
+        
         move = Vector3.ClampMagnitude(move, speed);
     }
 

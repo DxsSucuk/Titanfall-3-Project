@@ -89,7 +89,7 @@ public class AccesTitan : NetworkBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawSphere(chosenPoint, 5);
+        Gizmos.DrawWireSphere(chosenPoint, 2);
     }
     
     private void SetLayerRecrusivly(Transform parent)

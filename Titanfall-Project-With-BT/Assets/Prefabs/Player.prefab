@@ -698,8 +698,8 @@ GameObject:
   - component: {fileID: 2221782363576981722}
   - component: {fileID: 3894134462755980390}
   - component: {fileID: -3711079012651501327}
-  - component: {fileID: 5811566881052186957}
-  - component: {fileID: 6780627732231976350}
+  - component: {fileID: 6784739767715139531}
+  - component: {fileID: 4494807145954821382}
   m_Layer: 10
   m_Name: Player
   m_TagString: Player
@@ -758,8 +758,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  _TitanObject: {fileID: 1775270118597831475, guid: cf462d6715c994f4d848251fb0993fa2, type: 3}
-  _TitanScript: {fileID: 6743662489385095293, guid: cf462d6715c994f4d848251fb0993fa2, type: 3}
+  _vanguardTitanPrefab:
+    RawGuidValue: 00000000000000000000000000000000
 --- !u!114 &2221782363576981722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -785,6 +785,7 @@ MonoBehaviour:
   - {fileID: 4186822761668775030}
   - {fileID: 3894134462755980390}
   - {fileID: -3711079012651501327}
+  - {fileID: 6784739767715139531}
   SimulationBehaviours: []
 --- !u!114 &3894134462755980390
 MonoBehaviour:
@@ -805,7 +806,6 @@ MonoBehaviour:
     m_Bits: 8
   body: {fileID: 4186822761181016722}
   climbCheck: {fileID: 2377417085449272594}
-  velocityText: {fileID: 7299743536569897285}
   wallInputDifference: {fileID: 11400000, guid: 1874207427ed1f8429ce7c2602862a64, type: 2}
   wallNormalDirection: {fileID: 11400000, guid: a2327f6b53d5ac448ad8f4d75b09905c, type: 2}
   boostInputDifference: {fileID: 11400000, guid: 4c7e4dd04710c484bb9e6e2d7b9256f9, type: 2}
@@ -851,7 +851,7 @@ MonoBehaviour:
   runBobSpeed: 13
   sprintBobAmount: 0.07
   runBobAmount: 0.03
---- !u!114 &5811566881052186957
+--- !u!114 &6784739767715139531
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -860,28 +860,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 4186822761668775023}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 4969bb8e8551e43439eae8b783c28c10, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Pilot
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
---- !u!114 &6780627732231976350
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 4186822761209185573}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
+--- !u!114 &4494807145954821382
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -893,9 +891,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fe64c87f0ee34a4d866c26355925fae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canShoot: 0
-  shouldReload: 0
-  weapon: 0
 --- !u!1 &4952646332322502316
 GameObject:
   m_ObjectHideFlags: 0

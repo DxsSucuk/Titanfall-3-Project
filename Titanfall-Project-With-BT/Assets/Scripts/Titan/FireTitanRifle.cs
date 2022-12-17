@@ -53,7 +53,7 @@ public class FireTitanRifle : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (!HasInputAuthority) return;
+        if (!HasStateAuthority) return;
         
         if (enterScript.inTitan)
         {
