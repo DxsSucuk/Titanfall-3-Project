@@ -202,7 +202,7 @@ public class PilotMovement : NetworkBehaviour
 
         if (networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && !isCrouching)
         {
-            //// Crouch();
+            Crouch();
         }
         else if (!networkPilotInput.Buttons.IsSet(PilotButtons.Crouch) && isCrouching)
         {
@@ -240,7 +240,7 @@ public class PilotMovement : NetworkBehaviour
     
     void CheckGround()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, 0.02f, groundMask);
+        isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, groundMask);
         if (isGrounded)
         {
             inAir = 0.2f;

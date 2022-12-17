@@ -72,18 +72,32 @@ public class AccesTitan : NetworkBehaviour
             NetworkObject networkPlayerTitanObject =
                 Runner.Spawn(_vanguardTitanPrefab, spawnPosition, Quaternion.identity,
                     Runner.LocalPlayer);
-            networkPlayerTitanObject.gameObject.layer = 6;
-            SetLayerRecrusivly(networkPlayerTitanObject.transform);
-            TitanObject = networkPlayerTitanObject;
-
-            EnterVanguardTitan enterVanguardTitan = TitanObject.GetComponent<EnterVanguardTitan>();
-
-            enterVanguardTitan.player = networkPlayerObject.gameObject;
-
-            enterVanguardTitan.playerCamera = pilotCamera.gameObject;
-
-            TitanScript = enterVanguardTitan;
+            
+            if (HasInputAuthority)
+            {
+                networkPlayerTitanObject.gameObject.layer = 6;
+                SetLayerRecrusivly(networkPlayerTitanObject.transform);
+            }
+            
+            SetTitanDataRPC(networkPlayerObject, networkPlayerTitanObject);
         }
+    }
+
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.All)]
+    private void SetTitanDataRPC(NetworkObject networkPlayerObject, NetworkObject networkPlayerTitanObject)
+    {
+        TitanObject = networkPlayerTitanObject;
+
+        EnterVanguardTitan enterVanguardTitan = TitanObject.GetComponent<EnterVanguardTitan>();
+
+        enterVanguardTitan.player = networkPlayerObject.gameObject;
+
+        if (HasInputAuthority)
+        {
+            enterVanguardTitan.playerCamera = networkPlayerObject.GetComponentInChildren<Camera>().gameObject;
+        }
+
+        TitanScript = enterVanguardTitan;
     }
 
     void OnDrawGizmosSelected()
