@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5752340456004996185}
   - component: {fileID: 8681727043844850684}
   - component: {fileID: 6890305078118758198}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: uploads_files_133606_Submachine+Gun+M24+R_Done
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6219274907122123019}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PublicSmg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -125,7 +125,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6219274907231173833}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PublicMuzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -99,7 +99,6 @@ public class GunScript : MonoBehaviour
     {
         if (!gunValues.isReloading && gunValues.ammoLeft > 0 && timeSinceLastShot > 1f / (gunValues.fireRate / 60f))
         {
-            //Debug.Log("shoot");
             recoil.FireRecoil(gunValues.recoilX, gunValues.recoilY, gunValues.recoilZ);
 
             for (int i = 0; i < gunValues.bulletsPerShot; i++)
@@ -116,7 +115,7 @@ public class GunScript : MonoBehaviour
                     if (Physics.Raycast(cam.transform.position, direction, out rayHit, gunValues.range))
                     {
                         if (rayHit.transform == playerMain)
-                            return;
+                            continue;
 
                         GameObject impact = Instantiate(gunValues.impactEffect, rayHit.point, Quaternion.identity) as GameObject;
                         impact.transform.forward = rayHit.normal;
@@ -154,6 +153,7 @@ public class GunScript : MonoBehaviour
 
     void OnGunFire()
     {
+        Debug.Log("shoot");
         source.Stop();
         source.PlayOneShot(gunValues.fireSound);
         muzzlePoint.GetComponentInChildren<ParticleSystem>().Play();
