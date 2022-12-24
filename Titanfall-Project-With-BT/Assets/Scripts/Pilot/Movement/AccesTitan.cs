@@ -13,13 +13,19 @@ public class AccesTitan : NetworkBehaviour
     [Networked]
     public EnterVanguardTitan TitanScript { get; set; }
 
+    PilotMovement moveScript;
+
     GameObject[] titanDropPoints;
     float shortestDistance = 0f;
     Transform chosenPoint;
 
+    Animator animator;
+
     private void Start()
     {
         titanDropPoints = GameObject.FindGameObjectsWithTag("DropPoint");
+        moveScript = GetComponent<PilotMovement>();
+        animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -62,7 +68,22 @@ public class AccesTitan : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.F) && TitanScript.inRangeForEmbark)
         {
             StartCoroutine(TitanScript.Embark());
+
+            //moveScript.EmbarkLookDirection(TitanScript.embarkLookTarget.position);
+
+            moveScript.lookTarget = TitanScript.embarkLookTarget.position;
+            moveScript.canMove = false;
+            moveScript.embarking = true;
+            moveScript.embarkPos = TitanScript.embarkPos.position;
+            animator.SetTrigger("embark");
         }
+    }
+
+    public void ExitTitan()
+    {
+        moveScript.embarking = false;
+        moveScript.canMove = true;
+        animator.SetTrigger("exitTitan");
     }
 
 }

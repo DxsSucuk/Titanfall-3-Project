@@ -7,6 +7,7 @@ public class ProjectileScript : MonoBehaviour
     public ProjectileTemplate projectile;
     public Rigidbody rb;
     int collisions;
+    public AudioSource source;
 
     // Start is called before the first frame update
     void Start()
@@ -38,8 +39,11 @@ public class ProjectileScript : MonoBehaviour
         {
             IDamageable damageable = enemies[i].GetComponent<IDamageable>();
             if (damageable != null)
-                damageable.Damage(projectile.damage);
+                damageable.Damage(projectile.damage, projectile.armorPiercing);
         }
+
+        Instantiate(projectile.impactEffect, transform.position, Quaternion.identity);
+        source.PlayOneShot(projectile.impactSoundEffect);
         Destroy(gameObject);
     }
 

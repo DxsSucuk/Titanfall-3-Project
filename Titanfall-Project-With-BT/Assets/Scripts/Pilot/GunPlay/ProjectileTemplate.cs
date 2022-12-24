@@ -8,6 +8,7 @@ public class ProjectileTemplate : ScriptableObject
     public new string name;
 
     public float damage;
+    public float armorPiercing;
     
     public bool explode;
     public float explosionRange;
@@ -20,6 +21,7 @@ public class ProjectileTemplate : ScriptableObject
 
     public PhysicMaterial physics_mat;
 
-
+    public GameObject impactEffect;
+    public AudioClip impactSoundEffect;
 
 }

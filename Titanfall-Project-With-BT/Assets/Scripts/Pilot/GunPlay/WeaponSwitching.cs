@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -50,7 +51,7 @@ public class WeaponSwitching : MonoBehaviour
     public void Select()
     {
         int i = 0;
-        foreach(Transform weapon in transform)
+        foreach (Transform weapon in publicWeaponSwitcher.transform)
         {
             i++;
             if (i == inputHandling.weapon)
@@ -60,13 +61,17 @@ public class WeaponSwitching : MonoBehaviour
         }
 
         i = 0;
-        foreach (Transform weapon in publicWeaponSwitcher.transform)
+        foreach(Transform weapon in transform)
         {
             i++;
             if (i == inputHandling.weapon)
+            {
                 weapon.gameObject.SetActive(true);
+                var script = weapon.gameObject.GetComponent<GunScript>();
+                script.Switch();
+            }
             else
-                weapon.gameObject.SetActive(false); ;
+                weapon.gameObject.SetActive(false);
         }
     }
 

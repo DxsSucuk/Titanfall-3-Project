@@ -17,6 +17,7 @@ public class GunTemplate : ScriptableObject
     public float range;
     public float spread;
     public int bulletsPerShot;
+    public float armorPiercing;
 
     public GameObject projectile;
     public float bulletVelocityForce;
@@ -37,6 +38,7 @@ public class GunTemplate : ScriptableObject
     public AudioClip fireSound;
     public GameObject muzzleFlash;
     public GameObject impactEffect;
+    public GameObject hitEffect;
 
-    
+
 }

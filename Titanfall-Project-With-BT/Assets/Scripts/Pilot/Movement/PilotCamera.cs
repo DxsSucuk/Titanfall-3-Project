@@ -36,9 +36,11 @@ public class PilotCamera : NetworkBehaviour
             }
         }
 
+        if (this.transform == null)
+            return;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
         move = GetComponentInParent<PilotMovement>();
 
         defaultY = cam.transform.localPosition.y;
@@ -51,6 +53,9 @@ public class PilotCamera : NetworkBehaviour
 
     void Update()
     {
+        if (move.canMove == false)
+            return;
+
         rotY += look.x;
         rotX += look.y;
 

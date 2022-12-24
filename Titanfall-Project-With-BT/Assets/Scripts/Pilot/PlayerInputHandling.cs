@@ -8,14 +8,17 @@ public class PlayerInputHandling : MonoBehaviour
     public bool canShoot, shouldReload;
     public int weapon;
     WeaponSwitching weaponSwitch;
+    PilotMovement moveScript;
 
     private void Start()
     {
         weaponSwitch = GetComponentInChildren<WeaponSwitching>();
+        moveScript = GetComponentInParent<PilotMovement>();
     }
     public void OnFire(InputValue value)
     {
-        canShoot = value.isPressed;
+        if (!moveScript.isSprinting)
+            canShoot = value.isPressed;
     }
     public void OnReload(InputValue value)
     {

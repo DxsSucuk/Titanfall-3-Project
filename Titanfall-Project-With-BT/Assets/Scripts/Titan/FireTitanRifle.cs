@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Fusion;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static Unity.VisualScripting.Member;
 
 public class FireTitanRifle : NetworkBehaviour
 {
@@ -18,6 +19,8 @@ public class FireTitanRifle : NetworkBehaviour
     public ParticleSystem muzzleFlash;
     public ParticleSystem muzzleFlashSecondRifle;
     public GameObject impactEffect;
+    public AudioClip gunShot;
+    public AudioSource audioSource;
 
     bool canShoot;
     bool readyToShoot = true;
@@ -25,6 +28,7 @@ public class FireTitanRifle : NetworkBehaviour
 
     public float timeBetweenShots, timeBetweenShooting;
     public float spread;
+    float currentSpread;
 
     public int bulletsPerTap, bulletsLeft;
     int bulletsShot;
@@ -64,15 +68,20 @@ public class FireTitanRifle : NetworkBehaviour
         {
             HandleInput();
         }
+        if (moveScript.isWalking)
+            currentSpread = (spread / 2);
+        else
+            currentSpread = spread;
     }
 
     [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
     private void ShootRPC()
     {
+        audioSource.Stop();
         readyToShoot = false;
 
-        float xSpread = Random.Range(-spread, spread);
-        float ySpread = Random.Range(-spread, spread);
+        float xSpread = Random.Range(-currentSpread, currentSpread);
+        float ySpread = Random.Range(-currentSpread, currentSpread);
 
         Vector3 direction = cam.transform.forward + new Vector3(xSpread, ySpread, 0);
 
@@ -84,12 +93,18 @@ public class FireTitanRifle : NetworkBehaviour
             GameObject impact = Instantiate(impactEffect, hit.point, Quaternion.identity) as GameObject;
             impact.transform.forward = hit.normal;
 
+            audioSource.PlayOneShot(gunShot);
+
             Destroy(impact, 1.5f);
 
             if (hit.collider.CompareTag("Enemy"))
             {
                 StartCoroutine(hit.collider.GetComponent<RoninMovement>().TakeDamage(10));
             }
+
+            IDamageable damageable = hit.transform.GetComponent<IDamageable>();
+            if (damageable != null)
+                damageable.Damage(10, 4);
         }
 
         bulletsLeft--;

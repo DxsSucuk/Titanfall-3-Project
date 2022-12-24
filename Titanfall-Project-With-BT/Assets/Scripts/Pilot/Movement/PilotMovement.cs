@@ -51,6 +51,8 @@ public class PilotMovement : NetworkBehaviour
     public float normalGravity;
     public float wallRunGravity;
 
+    public bool canMove = true;
+
     bool shouldSprint;
     public bool isSprinting;
     bool shouldCrouch;
@@ -59,6 +61,10 @@ public class PilotMovement : NetworkBehaviour
     bool isWallRunning;
     public bool isGrounded;
     public bool isMoving;
+
+    public bool embarking;
+    public Vector3 embarkPos;
+    public Vector3 lookTarget;
 
     [Header("Jump")]
     public float jumpHeight;
@@ -146,6 +152,18 @@ public class PilotMovement : NetworkBehaviour
     void Update()
     {
         if (!HasInputAuthority)
+            return;
+
+        if (this.transform == null)
+            return;
+
+        if (embarking)
+        {
+            MoveToEmbarkPoint(embarkPos);
+            EmbarkLookDirection(lookTarget);
+        }
+
+        if (canMove == false)
             return;
 
         velocityText.text = speed.ToString();
@@ -296,6 +314,11 @@ public class PilotMovement : NetworkBehaviour
         }
 
         if (isSprinting && Vector3.Dot(transform.forward, input) < 0.5)
+        {
+            isSprinting = false;
+        }
+
+        if (isCrouching)
         {
             isSprinting = false;
         }
@@ -757,4 +780,26 @@ public class PilotMovement : NetworkBehaviour
             rig.weight = 1;
     }
 
+    public void EmbarkLookDirection(Vector3 lookTarget)
+    {
+        Vector3 targetPosition = new Vector3(lookTarget.x, this.transform.position.y, lookTarget.z);
+        transform.LookAt(targetPosition);
+    }
+
+    void MoveToEmbarkPoint(Vector3 target)
+    {
+        var offset = target - transform.position;
+        //Get the difference.
+        if (offset.magnitude > .1f)
+        {
+            //If we're further away than .1 unit, move towards the target.
+            //The minimum allowable tolerance varies with the speed of the object and the framerate. 
+            // 2 * tolerance must be >= moveSpeed / framerate or the object will jump right over the stop.
+            offset = offset.normalized * 15f;
+            //normalize it and account for movement speed.
+            controller.Move(offset * Time.deltaTime);
+            //actually move the character.
+        }
+
+    }
 }

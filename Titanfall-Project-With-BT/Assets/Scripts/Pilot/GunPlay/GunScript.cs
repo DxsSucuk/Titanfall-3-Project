@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.HID;
-using UnityEngine.WSA;
 
 public class GunScript : MonoBehaviour
 {
@@ -27,27 +26,43 @@ public class GunScript : MonoBehaviour
     Recoil recoil;
     WeaponSwitching weaponSwitching;
 
-    string publicMuzzle = "PublicMuzzle";
+    string publicMuzzle = "Muzzle";
 
-    private void Start()
+    bool firstSwitch = true;
+
+    // need to happen before switch, dont know how
+    public void Switch()
     {
-        inputHandling = GetComponentInParent<PlayerInputHandling>();
-        recoil = GetComponentInParent<Recoil>();
-        cam = GetComponentInParent<Camera>();
-        weaponSwitching = GetComponentInParent<WeaponSwitching>();
+        if (firstSwitch)
+        {
+            Debug.Log("switch");
+            inputHandling = GetComponentInParent<PlayerInputHandling>();
+            cam = GetComponentInParent<Camera>();
+            weaponSwitching = GetComponentInParent<WeaponSwitching>();
+            recoil = GetComponentInParent<Recoil>();
 
-        playerMain = transform.root;
-        gunValues.ammoLeft = gunValues.magSize;
-        publicMuzzlePoint = GameObject.Find(publicMuzzle);
+            playerMain = transform.root;
+            gunValues.ammoLeft = gunValues.magSize;
+            publicMuzzlePoint = GameObject.Find(gunValues.name + publicMuzzle);
+            Debug.Log(gunValues.name + publicMuzzle);
 
-        GameObject flash = Instantiate(gunValues.muzzleFlash, muzzlePoint.transform) as GameObject;
-        flash.layer = muzzlePoint.layer;
-        GameObject flash2 = Instantiate(gunValues.muzzleFlash, publicMuzzlePoint.transform) as GameObject;
-        flash2.layer = publicMuzzlePoint.layer;
+            GameObject flash = Instantiate(gunValues.muzzleFlash, muzzlePoint.transform) as GameObject;
+            flash.layer = muzzlePoint.layer;
+            GameObject flash2 = Instantiate(gunValues.muzzleFlash, publicMuzzlePoint.transform) as GameObject;
+            flash2.layer = publicMuzzlePoint.layer;
+            firstSwitch = false;
+
+            SetWeapon();
+        }
+        else
+            SetWeapon();
     }
 
-    private void OnEnable()
+    public void SetWeapon()
     {
+        muzzlePoint.GetComponentInChildren<ParticleSystem>().Stop();
+        publicMuzzlePoint.GetComponentInChildren<ParticleSystem>().Stop();
+        
         gunValues.isReloading = false;
         recoil.snappiness = gunValues.snappiness;
         recoil.returnSpeed = gunValues.returnSpeed;
@@ -117,14 +132,24 @@ public class GunScript : MonoBehaviour
                         if (rayHit.transform == playerMain)
                             continue;
 
-                        GameObject impact = Instantiate(gunValues.impactEffect, rayHit.point, Quaternion.identity) as GameObject;
-                        impact.transform.forward = rayHit.normal;
-
-                        Destroy(impact, 1.5f);
-
                         IDamageable damageable = rayHit.transform.GetComponent<IDamageable>();
                         if (damageable != null)
-                            damageable.Damage(gunValues.damage);
+                        {
+                            damageable.Damage(gunValues.damage, gunValues.armorPiercing);
+
+                            GameObject impact = Instantiate(gunValues.hitEffect, rayHit.point, Quaternion.identity) as GameObject;
+                            impact.transform.forward = rayHit.normal;
+
+                            Destroy(impact, 1.5f);
+                        }
+                        else
+                        {
+                            GameObject impact = Instantiate(gunValues.impactEffect, rayHit.point, Quaternion.identity) as GameObject;
+                            impact.transform.forward = rayHit.normal;
+
+                            Destroy(impact, 1.5f);
+                        }
+                            
                     }
                 }
                 else

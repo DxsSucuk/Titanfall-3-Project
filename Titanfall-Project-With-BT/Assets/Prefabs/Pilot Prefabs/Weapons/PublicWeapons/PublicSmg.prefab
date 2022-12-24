@@ -126,7 +126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6219274907231173833}
   m_Layer: 8
-  m_Name: PublicMuzzle
+  m_Name: SMGMuzzle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

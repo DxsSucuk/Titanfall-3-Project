@@ -30,6 +30,9 @@ public class EnterVanguardTitan : NetworkBehaviour
     public bool inRangeForEmbark;
  
     public float fallingSpeed;
+
+    public Transform embarkPos;
+    public Transform embarkLookTarget;
  
     // Start is called before the first frame update
     void Start()
@@ -70,6 +73,7 @@ public class EnterVanguardTitan : NetworkBehaviour
         if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkObject))
         {
             networkObject.gameObject.SetActive(true);
+            networkObject.gameObject.GetComponent<AccesTitan>().ExitTitan();
         }
     }
  

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Rocket
   damage: 100
+  armorPiercing: 5
   explode: 1
   explosionRange: 10
   useGravity: 1
@@ -21,3 +22,5 @@ MonoBehaviour:
   maxCollisions: 0
   lifeTime: 10
   physics_mat: {fileID: 0}
+  impactEffect: {fileID: 6184535327023240012, guid: 61d392eca775c394299e99ccb1aa66a4, type: 3}
+  impactSoundEffect: {fileID: 8300000, guid: ba5fc60609074fd43a1b8e2485b8f03f, type: 3}
