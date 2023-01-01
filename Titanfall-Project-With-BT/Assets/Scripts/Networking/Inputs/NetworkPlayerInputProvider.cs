@@ -20,7 +20,9 @@ public class NetworkPilotInputProvider : MonoBehaviour, INetworkRunnerCallbacks
     public void OnEnable() {
         if(_networkManager.Runner != null){
             // enabling the input map
+            _pilotInputMap.Player.Enable();
             _pilotInputMap.Pilot.Enable();
+            _pilotInputMap.Titan.Enable();
 
             _networkManager.Runner.AddCallbacks(this);
         }
@@ -38,20 +40,25 @@ public class NetworkPilotInputProvider : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        var pilotInput = new NetworkPilotInput();
+        var pilotInput = new NetworkPlayerInput();
+        var playerActions = _pilotInputMap.Player;
         var pilotActions = _pilotInputMap.Pilot;
+        var titanActions = _pilotInputMap.Titan;
+        var weaponActions = _pilotInputMap.Weapons;
 
-        pilotInput.Buttons.Set(NetworkPilotButtons.CROUCH, pilotActions.Crouch.IsPressed());
-        pilotInput.Buttons.Set(NetworkPilotButtons.SPRINT, pilotActions.Sprint.IsPressed());
-        pilotInput.Buttons.Set(NetworkPilotButtons.JUMP, pilotActions.Jump.triggered);
-        pilotInput.Buttons.Set(NetworkPilotButtons.SHOOT, pilotActions.Fire.IsPressed());
-        pilotInput.Buttons.Set(NetworkPilotButtons.RELOAD, pilotActions.Reload.IsPressed());
-        pilotInput.Buttons.Set(NetworkPilotButtons.SWITCH_PRIMARY, pilotActions.Primary.IsPressed());
-        pilotInput.Buttons.Set(NetworkPilotButtons.SWITCH_SECONDARY, pilotActions.Secondary.IsPressed());
-        pilotInput.Buttons.Set(NetworkPilotButtons.SWITCH_ANTI, pilotActions.AntiTitan.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.WALK, titanActions.Walk.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.CROUCH, pilotActions.Crouch.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.SPRINT, playerActions.Sprint.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.DASH, titanActions.Dash.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.JUMP, pilotActions.Jump.triggered);
+        pilotInput.Buttons.Set(NetworkPlayerButtons.SHOOT, weaponActions.Fire.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.RELOAD, weaponActions.Reload.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.SWITCH_PRIMARY, pilotActions.Primary.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.SWITCH_SECONDARY, pilotActions.Secondary.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.SWITCH_ANTI, pilotActions.AntiTitan.IsPressed());
         
-        pilotInput.move = pilotActions.Move.ReadValue<Vector2>();
-        pilotInput.look = pilotActions.Look.ReadValue<Vector2>();
+        pilotInput.move = playerActions.Move.ReadValue<Vector2>();
+        pilotInput.look = playerActions.Look.ReadValue<Vector2>();
         
         input.Set(pilotInput);
     }
@@ -124,7 +131,9 @@ public class NetworkPilotInputProvider : MonoBehaviour, INetworkRunnerCallbacks
     public void OnDisable(){
         if(_networkManager.Runner != null){
             // disabling the input map
+            _pilotInputMap.Player.Disable();
             _pilotInputMap.Pilot.Disable();
+            _pilotInputMap.Titan.Disable();
 
             _networkManager.Runner.RemoveCallbacks( this );
         }

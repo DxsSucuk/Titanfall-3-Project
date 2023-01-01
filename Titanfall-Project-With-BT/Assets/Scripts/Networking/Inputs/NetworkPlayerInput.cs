@@ -1,10 +1,12 @@
 ﻿using Fusion;
 using UnityEngine;
 
-enum NetworkPilotButtons
+enum NetworkPlayerButtons
 {
+    WALK,
     CROUCH,
     SPRINT,
+    DASH,
     JUMP,
     SHOOT,
     RELOAD,
@@ -13,7 +15,7 @@ enum NetworkPilotButtons
     SWITCH_ANTI,
 }
 
-public struct NetworkPilotInput : INetworkInput
+public struct NetworkPlayerInput : INetworkInput
 {
     public NetworkButtons Buttons;
     public Vector2 move;

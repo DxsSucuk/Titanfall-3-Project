@@ -20,18 +20,18 @@ public class PlayerInputHandling : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (GetInput<NetworkPilotInput>(out var input) == false) return;
+        if (GetInput<NetworkPlayerInput>(out var input) == false) return;
 
         var pressed = input.Buttons.GetPressed(ButtonsPrevious);
 
-        moveScript.shouldCrouch = pressed.IsSet(NetworkPilotButtons.CROUCH);
-        moveScript.shouldSprint = pressed.IsSet(NetworkPilotButtons.SPRINT);
-        moveScript.shouldJump = pressed.IsSet(NetworkPilotButtons.JUMP);
+        moveScript.shouldCrouch = pressed.IsSet(NetworkPlayerButtons.CROUCH);
+        moveScript.shouldSprint = pressed.IsSet(NetworkPlayerButtons.SPRINT);
+        moveScript.shouldJump = pressed.IsSet(NetworkPlayerButtons.JUMP);
         moveScript.moveData = input.move;
         pilotCamera.look = input.look * pilotCamera.sensitivity;
 
 
-        if (pressed.IsSet(NetworkPilotButtons.SHOOT))
+        if (pressed.IsSet(NetworkPlayerButtons.SHOOT))
         {
             if (!moveScript.isSprinting)
             {
@@ -43,23 +43,23 @@ public class PlayerInputHandling : NetworkBehaviour
             canShoot = false;
         }
 
-        shouldReload = pressed.IsSet(NetworkPilotButtons.RELOAD);
+        shouldReload = pressed.IsSet(NetworkPlayerButtons.RELOAD);
 
-        if (pressed.IsSet(NetworkPilotButtons.SWITCH_PRIMARY))
+        if (pressed.IsSet(NetworkPlayerButtons.SWITCH_PRIMARY))
         {
             weapon = 1;
             weaponSwitch.Select();
             weaponSwitch.HandleRig();
         }
 
-        if (pressed.IsSet(NetworkPilotButtons.SWITCH_SECONDARY))
+        if (pressed.IsSet(NetworkPlayerButtons.SWITCH_SECONDARY))
         {
             weapon = 2;
             weaponSwitch.Select();
             weaponSwitch.HandleRig();
         }
 
-        if (pressed.IsSet(NetworkPilotButtons.SWITCH_ANTI))
+        if (pressed.IsSet(NetworkPlayerButtons.SWITCH_ANTI))
         {
             weapon = 3;
             weaponSwitch.Select();
