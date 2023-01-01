@@ -10,9 +10,9 @@ public class TitanInputHandling : NetworkBehaviour
     
     private void Start()
     {
-        titanCamera = GetComponentInParent<VanguardCamera>();
-        moveScript = GetComponentInParent<VanguardMovement>();
-        fireTitanRifle = GetComponentInParent<FireTitanRifle>();
+        titanCamera = GetComponent<VanguardCamera>();
+        moveScript = GetComponent<VanguardMovement>();
+        fireTitanRifle = GetComponent<FireTitanRifle>();
     }
 
     public override void FixedUpdateNetwork()

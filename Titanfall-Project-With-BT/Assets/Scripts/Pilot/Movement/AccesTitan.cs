@@ -1,8 +1,5 @@
 using Fusion;
 
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using Utilities;
 
@@ -78,8 +75,8 @@ public class AccesTitan : NetworkBehaviour
             
             if (HasInputAuthority)
             {
-                ////networkPlayerTitanObject.gameObject.layer = 6;
-                ////LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
+                networkPlayerTitanObject.gameObject.layer = 6;
+                LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
             }
         }
     }

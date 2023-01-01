@@ -49,7 +49,7 @@ public class NetworkPilotInputProvider : MonoBehaviour, INetworkRunnerCallbacks
         pilotInput.Buttons.Set(NetworkPlayerButtons.WALK, titanActions.Walk.IsPressed());
         pilotInput.Buttons.Set(NetworkPlayerButtons.CROUCH, pilotActions.Crouch.IsPressed());
         pilotInput.Buttons.Set(NetworkPlayerButtons.SPRINT, playerActions.Sprint.IsPressed());
-        pilotInput.Buttons.Set(NetworkPlayerButtons.DASH, titanActions.Dash.IsPressed());
+        pilotInput.Buttons.Set(NetworkPlayerButtons.DASH, titanActions.Dash.triggered);
         pilotInput.Buttons.Set(NetworkPlayerButtons.JUMP, pilotActions.Jump.triggered);
         pilotInput.Buttons.Set(NetworkPlayerButtons.SHOOT, weaponActions.Fire.IsPressed());
         pilotInput.Buttons.Set(NetworkPlayerButtons.RELOAD, weaponActions.Reload.IsPressed());
