@@ -21,17 +21,18 @@ public class PlayerInputHandling : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if (GetInput<NetworkPlayerInput>(out var input) == false) return;
-
+        
         var pressed = input.Buttons.GetPressed(ButtonsPrevious);
 
-        moveScript.shouldCrouch = pressed.IsSet(NetworkPlayerButtons.CROUCH);
-        moveScript.shouldSprint = pressed.IsSet(NetworkPlayerButtons.SPRINT);
+        ButtonsPrevious = input.Buttons;
+
+        moveScript.shouldCrouch = input.Buttons.IsSet(NetworkPlayerButtons.CROUCH);
+        moveScript.shouldSprint = input.Buttons.IsSet(NetworkPlayerButtons.SPRINT);
         moveScript.shouldJump = pressed.IsSet(NetworkPlayerButtons.JUMP);
         moveScript.moveData = input.move;
         pilotCamera.look = input.look * pilotCamera.sensitivity;
 
-
-        if (pressed.IsSet(NetworkPlayerButtons.SHOOT))
+        if (input.Buttons.IsSet(NetworkPlayerButtons.SHOOT))
         {
             if (!moveScript.isSprinting)
             {

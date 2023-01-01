@@ -1,9 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.HID;
 
 public class GunScript : MonoBehaviour
 {
@@ -35,7 +31,6 @@ public class GunScript : MonoBehaviour
     {
         if (firstSwitch)
         {
-            Debug.Log("switch");
             inputHandling = GetComponentInParent<PlayerInputHandling>();
             cam = GetComponentInParent<Camera>();
             weaponSwitching = GetComponentInParent<WeaponSwitching>();
@@ -135,7 +130,7 @@ public class GunScript : MonoBehaviour
                         IDamageable damageable = rayHit.transform.GetComponent<IDamageable>();
                         if (damageable != null)
                         {
-                            damageable.Damage(gunValues.damage, gunValues.armorPiercing);
+                            damageable.DamageRPC(gunValues.damage, gunValues.armorPiercing);
 
                             GameObject impact = Instantiate(gunValues.hitEffect, rayHit.point, Quaternion.identity) as GameObject;
                             impact.transform.forward = rayHit.normal;
@@ -178,7 +173,6 @@ public class GunScript : MonoBehaviour
 
     void OnGunFire()
     {
-        Debug.Log("shoot");
         source.Stop();
         source.PlayOneShot(gunValues.fireSound);
         muzzlePoint.GetComponentInChildren<ParticleSystem>().Play();

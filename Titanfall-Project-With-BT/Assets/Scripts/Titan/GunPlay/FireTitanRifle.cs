@@ -91,7 +91,7 @@ public class FireTitanRifle : NetworkBehaviour
 
             IDamageable damageable = hit.transform.GetComponent<IDamageable>();
             if (damageable != null)
-                damageable.Damage(10, 4);
+                damageable.DamageRPC(10, 4);
         }
 
         bulletsLeft--;

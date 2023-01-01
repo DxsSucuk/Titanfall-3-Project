@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Fusion;
 
 public interface IDamageable 
 {
-    public void Damage(float damage, float armorPiercing);
+    
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
+    public void DamageRPC(float damage, float armorPiercing);
 }

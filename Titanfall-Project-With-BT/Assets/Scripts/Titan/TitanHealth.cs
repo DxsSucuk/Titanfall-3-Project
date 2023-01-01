@@ -1,12 +1,15 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Fusion;
 using TMPro;
 using UnityEngine;
 
 public class TitanHealth : MonoBehaviour, IDamageable
 {
-    private float health = 100f;
+    [Networked]
+    private float health { get; set; }
     private float armor = 3f;
     public TextMeshProUGUI healthText;
 
@@ -16,7 +19,13 @@ public class TitanHealth : MonoBehaviour, IDamageable
 
     bool alreadyDead;
 
-    public void Damage(float damage, float armorPiercing)
+    private void Awake()
+    {
+        health = 100;
+    }
+
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
+    public void DamageRPC(float damage, float armorPiercing)
     {
         if (armorPiercing > armor)
         {

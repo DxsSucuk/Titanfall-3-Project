@@ -13,8 +13,12 @@ public class PilotCamera : NetworkBehaviour
     public Camera cam;
 
     public Vector2 look;
-    float rotY = 0f;
-    float rotX = 0f;
+    
+    [Networked]
+    private float rotY { get; set; }
+    
+    [Networked]
+    private float rotX { get; set; }
 
     PilotMovement move;
 
@@ -67,7 +71,8 @@ public class PilotCamera : NetworkBehaviour
         if (move.isMoving && move.isGrounded && !move.isSliding)
         {
             timer += Time.deltaTime * (move.isSprinting ? sprintBobSpeed : runBobSpeed);
-            cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, defaultY + Mathf.Sin(timer) * (move.isSprinting ? sprintBobAmount : runBobAmount), cam.transform.localPosition.z);
+            Transform camTransform = cam.transform;
+            camTransform.localPosition = new Vector3(camTransform.localPosition.x, defaultY + Mathf.Sin(timer) * (move.isSprinting ? sprintBobAmount : runBobAmount), camTransform.localPosition.z);
         }
     }
 

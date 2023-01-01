@@ -1,11 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 using TMPro;
 
 public class PlayerHealth : MonoBehaviour, IDamageable
 {
-    private float health = 100f;
+    [Networked]
+    private float health { get; set; }
     public TextMeshProUGUI healthText;
 
     public GameObject rig;
@@ -19,6 +19,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 
     void Awake()
     {
+        health = 100;
         ragDollColliders = rig.GetComponentsInChildren<Collider>();
         ragDollRigidBodies = rig.GetComponentsInChildren<Rigidbody>();
 
@@ -35,7 +36,8 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         moveScript = GetComponentInParent<PilotMovement>();
     }
 
-    public void Damage(float damage, float armorPiercing)
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
+    public void DamageRPC(float damage, float armorPiercing)
     {
         health -= damage;
         if (health <= 0)    
