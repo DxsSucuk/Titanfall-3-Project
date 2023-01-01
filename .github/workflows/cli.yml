@@ -1,4 +1,4 @@
-name: Unity Builds
+name: Unity CLI builds
 on:
   workflow_dispatch: {}
   release:
