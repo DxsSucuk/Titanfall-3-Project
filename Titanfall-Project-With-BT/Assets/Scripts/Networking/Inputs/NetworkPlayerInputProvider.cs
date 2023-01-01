@@ -5,7 +5,7 @@ using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
 
-public class NetworkPilotInputProvider : MonoBehaviour, INetworkRunnerCallbacks
+public class NetworkPlayerInputProvider : MonoBehaviour, INetworkRunnerCallbacks
 {
     private PilotInputMap _pilotInputMap;
 

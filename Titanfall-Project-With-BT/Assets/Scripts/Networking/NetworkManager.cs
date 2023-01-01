@@ -16,10 +16,14 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public GameObject InputProviderGameObject;
 
-    public Transform spawnA;
-    public Transform spawnB;
+    public GameObject[] spawnPoints;
 
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+    private void Awake()
+    {
+        spawnPoints = GameObject.FindGameObjectsWithTag("Respawn");
+    }
 
     async void StartGame(GameMode gameMode)
     {
@@ -96,16 +100,35 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log("Player joined Server -> " + player.PlayerId);
-        if (runner.LocalPlayer == player)
+        if (runner.GameMode == GameMode.Shared || runner.GameMode == GameMode.Single)
         {
-            // Create a unique position for the player
-            Vector3 spawnPosition = spawnB.position;
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            if (runner.LocalPlayer == player)
+            {
+                // Create a unique position for the player
+                Vector3 spawnPosition = spawnPoints[new System.Random().Next(spawnPoints.Length - 1)].transform.position;
+                NetworkObject networkPlayerObject =
+                    runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
 
-            runner.SetPlayerObject(player, networkPlayerObject);
+                runner.SetPlayerObject(player, networkPlayerObject);
 
-            // Keep track of the player avatars so we can remove it when they disconnect
-            _spawnedCharacters.Add(player, networkPlayerObject);
+                // Keep track of the player avatars so we can remove it when they disconnect
+                _spawnedCharacters.Add(player, networkPlayerObject);
+            }
+        }
+        else
+        {
+            if (runner.IsServer)
+            {
+                // Create a unique position for the player
+                Vector3 spawnPosition = spawnPoints[new System.Random().Next(spawnPoints.Length - 1)].transform.position;
+                NetworkObject networkPlayerObject =
+                    runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+
+                runner.SetPlayerObject(player, networkPlayerObject);
+
+                // Keep track of the player avatars so we can remove it when they disconnect
+                _spawnedCharacters.Add(player, networkPlayerObject);
+            }
         }
     }
     

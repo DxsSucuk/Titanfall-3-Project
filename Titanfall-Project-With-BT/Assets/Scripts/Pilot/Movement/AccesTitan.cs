@@ -15,7 +15,6 @@ public class AccesTitan : NetworkBehaviour
 
     PilotMovement moveScript;
     
-    float shortestDistance = 0f;
     Vector3 chosenPoint;
 
     Animator animator;
@@ -69,18 +68,26 @@ public class AccesTitan : NetworkBehaviour
             }
 
             Vector3 spawnPosition = chosenPoint + new Vector3(0, 150, 0);
-            NetworkObject networkPlayerTitanObject =
+            TitanObject =
                 Runner.Spawn(_vanguardTitanPrefab, spawnPosition, Quaternion.identity,
                     Runner.LocalPlayer);
             
+
+            EnterVanguardTitan enterVanguardTitan = TitanObject.GetComponent<EnterVanguardTitan>();
+
+            enterVanguardTitan.player = networkPlayerObject.gameObject;
+
+            TitanScript = enterVanguardTitan;
+            
             if (HasInputAuthority)
             {
-                networkPlayerTitanObject.gameObject.layer = 6;
-                LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
+                enterVanguardTitan.playerCamera = networkPlayerObject.GetComponentInChildren<Camera>().gameObject;
+                TitanObject.gameObject.layer = 6;
+                LayerUtility.SetLayerRecrusivly(TitanObject.transform);
             }
+            
         }
     }
-
 
     void EmbarkWithTitan()
     {
