@@ -12,7 +12,7 @@ public class PilotCamera : NetworkBehaviour
     public float sensitivity;
     public Camera cam;
 
-    Vector2 look;
+    public Vector2 look;
     float rotY = 0f;
     float rotX = 0f;
 
@@ -36,7 +36,7 @@ public class PilotCamera : NetworkBehaviour
             }
         }
 
-        if (this.transform == null)
+        if (transform == null)
             return;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -45,12 +45,7 @@ public class PilotCamera : NetworkBehaviour
 
         defaultY = cam.transform.localPosition.y;
     }
-
-    public void OnLook(InputValue value)
-    {
-        look = value.Get<Vector2>()*sensitivity;
-    }
-
+    
     void Update()
     {
         if (move.canMove == false)

@@ -32,9 +32,9 @@ public class WeaponSway : NetworkBehaviour
         float y = look.y * sway;
 
         Quaternion rotationX = Quaternion.AngleAxis(-y, Vector3.right);
-        Quaternion rotationy = Quaternion.AngleAxis(x, Vector3.up);
+        Quaternion rotationY = Quaternion.AngleAxis(x, Vector3.up);
 
-        Quaternion targetRotation = rotationX * rotationy;
+        Quaternion targetRotation = rotationX * rotationY;
 
         weapon.transform.localRotation = Quaternion.Slerp(weapon.transform.localRotation, targetRotation, smooth * Time.deltaTime);
     }

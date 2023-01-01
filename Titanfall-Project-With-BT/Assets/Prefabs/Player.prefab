@@ -566,6 +566,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   healthText: {fileID: 633951766772717366}
+  rig: {fileID: 0}
+  capsuleCollider: {fileID: 0}
+  animator: {fileID: 0}
+  ragDollColliders: []
+  ragDollRigidBodies: []
 --- !u!1 &4186822761209185572
 GameObject:
   m_ObjectHideFlags: 0
@@ -758,6 +763,8 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _TitanObject: {fileID: 1775270118597831475, guid: cf462d6715c994f4d848251fb0993fa2, type: 3}
   _TitanScript: {fileID: 6743662489385095293, guid: cf462d6715c994f4d848251fb0993fa2, type: 3}
+  _vanguardTitanPrefab:
+    RawGuidValue: 00000000000000000000000000000000
 --- !u!114 &2221782363576981722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -783,6 +790,7 @@ MonoBehaviour:
   - {fileID: 4186822761668775030}
   - {fileID: 3894134462755980390}
   - {fileID: -3711079012651501327}
+  - {fileID: 6780627732231976350}
   SimulationBehaviours: []
 --- !u!114 &3894134462755980390
 MonoBehaviour:
@@ -816,10 +824,14 @@ MonoBehaviour:
   climbSpeed: 7
   normalGravity: -21
   wallRunGravity: -2
+  canMove: 1
   isSprinting: 0
   isSliding: 0
   isGrounded: 0
   isMoving: 0
+  embarking: 0
+  embarkPos: {x: 0, y: 0, z: 0}
+  lookTarget: {x: 0, y: 0, z: 0}
   jumpHeight: 2.3
   maxSlideTimer: 2
   slideSpeedIncrease: 4
@@ -893,6 +905,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fe64c87f0ee34a4d866c26355925fae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   canShoot: 0
   shouldReload: 0
   weapon: 0

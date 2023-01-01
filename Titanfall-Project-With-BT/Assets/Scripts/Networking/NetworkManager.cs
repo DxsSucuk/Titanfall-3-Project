@@ -4,14 +4,17 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Utilities;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    NetworkRunner _runner;
+    public NetworkRunner Runner;
 
     [SerializeField] private NetworkPrefabRef _playerPrefab;
 
     [SerializeField] private NetworkPrefabRef _vanguardTitanPrefab;
+
+    public GameObject InputProviderGameObject;
 
     public Transform spawnA;
     public Transform spawnB;
@@ -20,25 +23,31 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     async void StartGame(GameMode gameMode)
     {
-        _runner = gameObject.AddComponent<NetworkRunner>();
-        _runner.ProvideInput = true;
+        Runner = gameObject.AddComponent<NetworkRunner>();
+        Runner.ProvideInput = true;
 
-        await _runner.StartGame(new StartGameArgs()
+        await Runner.StartGame(new StartGameArgs()
         {
             GameMode = gameMode,
             SessionName = "WeBallin",
             Scene = SceneManager.GetActiveScene().buildIndex,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
         });
+        
+        InputProviderGameObject.SetActive(true);
     }
 
     private void OnGUI()
     {
-        if (_runner == null)
+        if (Runner == null)
         {
-            if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
+            if (GUI.Button(new Rect(0, 40, 200, 40), "Create"))
             {
-                StartGame(GameMode.Shared);
+                StartGame(GameMode.Host);
+            }
+            if (GUI.Button(new Rect(0, 100, 200, 40), "Join"))
+            {
+                StartGame(GameMode.Client);
             }
         }
     }
@@ -76,13 +85,12 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        // Ignore since we dont use a Host-Client scenario rn.
+        // Is being handled by the NetworkPilotInputProvider!
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
     {
-        // No need for this right now.
-        Debug.Log("Input by " + player.PlayerId + " is missing! (Input -> " + input + ")");
+        // Is being handled by the NetworkPilotInputProvider!
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -102,7 +110,7 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
                 runner.Spawn(_vanguardTitanPrefab, titanPosition, Quaternion.identity, player);
 
             networkPlayerTitanObject.gameObject.layer = 6;
-            SetLayerRecrusivly(networkPlayerTitanObject.transform);
+            LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
 
             AccesTitan accesTitan = networkPlayerObject.GetComponent<AccesTitan>();
             accesTitan.TitanObject = networkPlayerTitanObject;
@@ -114,22 +122,6 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
             // Keep track of the player avatars so we can remove it when they disconnect
             _spawnedCharacters.Add(player, networkPlayerObject);
-        }
-    }
-
-    private void SetLayerRecrusivly(Transform parent)
-    {
-        foreach (Transform child in parent)
-        {
-            if (child.gameObject.layer == 9)
-            {
-                child.gameObject.layer = 6;
-            }
-
-            if (child.childCount > 0)
-            {
-                SetLayerRecrusivly(child);
-            }
         }
     }
     
