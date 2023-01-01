@@ -27,10 +27,10 @@ public class PlayerInputHandling : NetworkBehaviour
         moveScript.shouldCrouch = pressed.IsSet(NetworkPilotButtons.CROUCH);
         moveScript.shouldSprint = pressed.IsSet(NetworkPilotButtons.SPRINT);
         moveScript.shouldJump = pressed.IsSet(NetworkPilotButtons.JUMP);
-        moveScript.moveData = input.move.normalized;
-        pilotCamera.look = input.look.normalized * pilotCamera.sensitivity;
+        moveScript.moveData = input.move;
+        pilotCamera.look = input.look * pilotCamera.sensitivity;
 
-        
+
         if (pressed.IsSet(NetworkPilotButtons.SHOOT))
         {
             if (!moveScript.isSprinting)

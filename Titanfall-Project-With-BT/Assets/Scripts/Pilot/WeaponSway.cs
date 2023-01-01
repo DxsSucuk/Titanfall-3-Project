@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class WeaponSway : NetworkBehaviour
 {
+    
+    //TODO:: discuss if this class is needed? I could not find any usage of this class.
     public float smooth;
     public float sway;
 
@@ -16,14 +18,9 @@ public class WeaponSway : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!HasInputAuthority) return;
+        if (!HasStateAuthority) return;
 
         SwayWeapon();
-    }
-
-    public void OnLook(InputValue value)
-    {
-        look = value.Get<Vector2>();
     }
 
     void SwayWeapon()

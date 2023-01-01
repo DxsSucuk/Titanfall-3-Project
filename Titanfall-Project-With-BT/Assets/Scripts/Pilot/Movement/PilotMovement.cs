@@ -146,7 +146,7 @@ public class PilotMovement : NetworkBehaviour
 
     void Update()
     {
-        if (!HasInputAuthority)
+        if (!HasStateAuthority)
             return;
 
         if (transform == null)
