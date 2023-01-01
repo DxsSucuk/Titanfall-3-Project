@@ -755,15 +755,6 @@ public partial class @PilotInputMap : IInputActionCollection2, IDisposable
             ""id"": ""4cf738a0-f4c6-4e1c-a22a-b19a7015cb6b"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
-                    ""type"": ""Button"",
-                    ""id"": ""c79cfe81-03bd-45a9-b285-5045ff5984e5"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""Reload"",
                     ""type"": ""Value"",
                     ""id"": ""f847aa86-dd85-4704-b990-0a5fe54e4e81"",
@@ -783,17 +774,6 @@ public partial class @PilotInputMap : IInputActionCollection2, IDisposable
                 }
             ],
             ""bindings"": [
-                {
-                    ""name"": """",
-                    ""id"": ""aa15c22d-9890-4530-bf69-cc9cee60c6dd"",
-                    ""path"": """",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""New action"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
                 {
                     ""name"": """",
                     ""id"": ""2427c05f-5799-4c11-bdc3-9309bbe04f6d"",
@@ -1057,7 +1037,6 @@ public partial class @PilotInputMap : IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         // Weapons
         m_Weapons = asset.FindActionMap("Weapons", throwIfNotFound: true);
-        m_Weapons_Newaction = m_Weapons.FindAction("New action", throwIfNotFound: true);
         m_Weapons_Reload = m_Weapons.FindAction("Reload", throwIfNotFound: true);
         m_Weapons_Fire = m_Weapons.FindAction("Fire", throwIfNotFound: true);
         // Pilot
@@ -1284,14 +1263,12 @@ public partial class @PilotInputMap : IInputActionCollection2, IDisposable
     // Weapons
     private readonly InputActionMap m_Weapons;
     private IWeaponsActions m_WeaponsActionsCallbackInterface;
-    private readonly InputAction m_Weapons_Newaction;
     private readonly InputAction m_Weapons_Reload;
     private readonly InputAction m_Weapons_Fire;
     public struct WeaponsActions
     {
         private @PilotInputMap m_Wrapper;
         public WeaponsActions(@PilotInputMap wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_Weapons_Newaction;
         public InputAction @Reload => m_Wrapper.m_Weapons_Reload;
         public InputAction @Fire => m_Wrapper.m_Weapons_Fire;
         public InputActionMap Get() { return m_Wrapper.m_Weapons; }
@@ -1303,9 +1280,6 @@ public partial class @PilotInputMap : IInputActionCollection2, IDisposable
         {
             if (m_Wrapper.m_WeaponsActionsCallbackInterface != null)
             {
-                @Newaction.started -= m_Wrapper.m_WeaponsActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_WeaponsActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_WeaponsActionsCallbackInterface.OnNewaction;
                 @Reload.started -= m_Wrapper.m_WeaponsActionsCallbackInterface.OnReload;
                 @Reload.performed -= m_Wrapper.m_WeaponsActionsCallbackInterface.OnReload;
                 @Reload.canceled -= m_Wrapper.m_WeaponsActionsCallbackInterface.OnReload;
@@ -1316,9 +1290,6 @@ public partial class @PilotInputMap : IInputActionCollection2, IDisposable
             m_Wrapper.m_WeaponsActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Newaction.started += instance.OnNewaction;
-                @Newaction.performed += instance.OnNewaction;
-                @Newaction.canceled += instance.OnNewaction;
                 @Reload.started += instance.OnReload;
                 @Reload.performed += instance.OnReload;
                 @Reload.canceled += instance.OnReload;
@@ -1501,7 +1472,6 @@ public partial class @PilotInputMap : IInputActionCollection2, IDisposable
     }
     public interface IWeaponsActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
         void OnReload(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
     }

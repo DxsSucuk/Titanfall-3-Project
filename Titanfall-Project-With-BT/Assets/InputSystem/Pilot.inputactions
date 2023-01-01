@@ -733,15 +733,6 @@
             "id": "4cf738a0-f4c6-4e1c-a22a-b19a7015cb6b",
             "actions": [
                 {
-                    "name": "New action",
-                    "type": "Button",
-                    "id": "c79cfe81-03bd-45a9-b285-5045ff5984e5",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Reload",
                     "type": "Value",
                     "id": "f847aa86-dd85-4704-b990-0a5fe54e4e81",
@@ -761,17 +752,6 @@
                 }
             ],
             "bindings": [
-                {
-                    "name": "",
-                    "id": "aa15c22d-9890-4530-bf69-cc9cee60c6dd",
-                    "path": "",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "New action",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
                 {
                     "name": "",
                     "id": "2427c05f-5799-4c11-bdc3-9309bbe04f6d",

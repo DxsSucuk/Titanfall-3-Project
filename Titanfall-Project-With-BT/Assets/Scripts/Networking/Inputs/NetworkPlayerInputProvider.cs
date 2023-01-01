@@ -21,6 +21,7 @@ public class NetworkPlayerInputProvider : MonoBehaviour, INetworkRunnerCallbacks
         if(_networkManager.Runner != null){
             // enabling the input map
             _pilotInputMap.Player.Enable();
+            _pilotInputMap.Weapons.Enable();
             _pilotInputMap.Pilot.Enable();
             _pilotInputMap.Titan.Enable();
 
@@ -132,6 +133,7 @@ public class NetworkPlayerInputProvider : MonoBehaviour, INetworkRunnerCallbacks
         if(_networkManager.Runner != null){
             // disabling the input map
             _pilotInputMap.Player.Disable();
+            _pilotInputMap.Weapons.Disable();
             _pilotInputMap.Pilot.Disable();
             _pilotInputMap.Titan.Disable();
 
