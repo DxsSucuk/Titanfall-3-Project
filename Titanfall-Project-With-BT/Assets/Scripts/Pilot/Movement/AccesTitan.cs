@@ -67,7 +67,6 @@ public class AccesTitan : NetworkBehaviour
             }
             else
             {
-                // Fallback just in case.
                 chosenPoint = networkPlayerObject.transform.position;
             }
 
@@ -78,8 +77,8 @@ public class AccesTitan : NetworkBehaviour
             
             if (HasInputAuthority)
             {
-                networkPlayerTitanObject.gameObject.layer = 6;
-                LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
+                ////networkPlayerTitanObject.gameObject.layer = 6;
+                ////LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
             }
         }
     }
