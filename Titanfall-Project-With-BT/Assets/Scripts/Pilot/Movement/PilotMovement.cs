@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -5,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
 using UnityEngine.Animations.Rigging;
+using Utilities;
 
 public class PilotMovement : NetworkBehaviour
 {
@@ -126,9 +128,16 @@ public class PilotMovement : NetworkBehaviour
     public float cameraChangeTime;
     public float wallRunTilt;
     public float tilt;
-
+    
     void Start()
     {
+        if (!HasInputAuthority)
+        {
+            LayerUtility.ReplaceLayerRecursively(transform,8, 12);
+            LayerUtility.ReplaceLayerRecursively(transform,11, 8);
+            velocityText.transform.parent.gameObject.SetActive(false);
+        }
+        
         controller = GetComponent<CharacterController>();
         startHeight = transform.localScale.y;
         normalFov = playerCamera.fieldOfView;

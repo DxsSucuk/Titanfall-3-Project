@@ -83,7 +83,7 @@ public class AccesTitan : NetworkBehaviour
             {
                 enterVanguardTitan.playerCamera = networkPlayerObject.GetComponentInChildren<Camera>().gameObject;
                 TitanObject.gameObject.layer = 6;
-                LayerUtility.SetLayerRecrusivly(TitanObject.transform);
+                LayerUtility.ReplaceLayerRecursively(TitanObject.transform, 9, 6);
             }
             
         }

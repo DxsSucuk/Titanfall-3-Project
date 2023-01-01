@@ -2776,6 +2776,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cb28a8ff3a7b004fa32387731530527, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   primary: {fileID: 6219274907122123018, guid: 599719d415d9fc843b9f8f1df1cdcf62, type: 3}
   secondary: {fileID: 1848325326254963559, guid: 38940620e1562ec4e844f1c0cf111045, type: 3}
   antiTitan: {fileID: 8894832321262586673, guid: 5f7ac35d85d891f4e82c8ba962968113, type: 3}
@@ -7620,6 +7621,37 @@ Transform:
   m_Father: {fileID: 6566707622828211453}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7387422360349818703
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6018106245106911505}
+  m_Layer: 8
+  m_Name: WorldBodyPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6018106245106911505
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7387422360349818703}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8685051920774235635}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7421063285466611488
 GameObject:
   m_ObjectHideFlags: 0
@@ -9308,7 +9340,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2815
+    m_Bits: 6911
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -9338,12 +9370,14 @@ GameObject:
   m_Component:
   - component: {fileID: 8685051920774235635}
   - component: {fileID: 8685051920774235633}
-  - component: {fileID: 7987677558153991696}
   - component: {fileID: 3771577491933068419}
   - component: {fileID: 2366165501117250643}
   - component: {fileID: 3962761533346456155}
   - component: {fileID: 5263106708134283049}
   - component: {fileID: 4441349691967534058}
+  - component: {fileID: 5517338721250503097}
+  - component: {fileID: 3771883809875422940}
+  - component: {fileID: 7173669399725425473}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -9367,6 +9401,7 @@ Transform:
   - {fileID: 1293969314879540798}
   - {fileID: 8685051920039455221}
   - {fileID: 8685051919339034081}
+  - {fileID: 6018106245106911505}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9388,36 +9423,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7987677558153991696
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8685051920774235404}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 4969bb8e8551e43439eae8b783c28c10, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Pilot
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!114 &3771577491933068419
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9461,6 +9466,9 @@ MonoBehaviour:
   - {fileID: 3962761533346456155}
   - {fileID: 5263106708134283049}
   - {fileID: 4441349691967534058}
+  - {fileID: 3771883809875422940}
+  - {fileID: 7173669399725425473}
+  - {fileID: 3410177907329149596}
   SimulationBehaviours: []
 --- !u!114 &3962761533346456155
 MonoBehaviour:
@@ -9556,6 +9564,80 @@ MonoBehaviour:
   canShoot: 0
   shouldReload: 0
   weapon: 1
+--- !u!54 &5517338721250503097
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8685051920774235404}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &3771883809875422940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8685051920774235404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1710889294, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 6018106245106911505}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03
+--- !u!114 &7173669399725425473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8685051920774235404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 506319458, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  Animator: {fileID: 6226181833938332166}
+  TotalWords: 8
+  SyncSettings: -1
+  FloatAccuracy:
+    _value: 0
+    _inverse: 0
+    _hash: -814817977
+  TimeAccuracy:
+    _value: 0
+    _inverse: 0
+    _hash: 1061325578
+  WeightAccuracy:
+    _value: 0
+    _inverse: 0
+    _hash: -814817977
+  StateHashes: 0000000066c12eb33b90c22ff3b09ce0646ee5f381502ce899916afdf38ddc86847db7d928a98107ec5dd6e20e78689c53298400b66645821d1291574a6264fbad450664f56214b4b320d769c607e15cdde922e4ca635ca8c86981222d7117971ced7209cb5711b3860277181dd05372
+  TriggerHashes: 000000008db10a97361b7c0f
 --- !u!1 &8688712604712371511
 GameObject:
   m_ObjectHideFlags: 0

@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cb28a8ff3a7b004fa32387731530527, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   primary: {fileID: 0}
   secondary: {fileID: 0}
   antiTitan: {fileID: 0}
@@ -791,6 +792,7 @@ MonoBehaviour:
   - {fileID: 3894134462755980390}
   - {fileID: -3711079012651501327}
   - {fileID: 6780627732231976350}
+  - {fileID: 1520717099243298679}
   SimulationBehaviours: []
 --- !u!114 &3894134462755980390
 MonoBehaviour:
@@ -817,6 +819,7 @@ MonoBehaviour:
   wallInputDifference: {fileID: 11400000, guid: 1874207427ed1f8429ce7c2602862a64, type: 2}
   wallNormalDirection: {fileID: 11400000, guid: a2327f6b53d5ac448ad8f4d75b09905c, type: 2}
   boostInputDifference: {fileID: 11400000, guid: 4c7e4dd04710c484bb9e6e2d7b9256f9, type: 2}
+  moveData: {x: 0, y: 0}
   runSpeed: 4.7
   sprintSpeed: 8.5
   crouchSpeed: 2.5
@@ -825,8 +828,13 @@ MonoBehaviour:
   normalGravity: -21
   wallRunGravity: -2
   canMove: 1
+  shouldSprint: 0
   isSprinting: 0
+  shouldCrouch: 0
+  isCrouching: 0
+  shouldJump: 0
   isSliding: 0
+  isWallRunning: 0
   isGrounded: 0
   isMoving: 0
   embarking: 0
@@ -859,6 +867,7 @@ MonoBehaviour:
   maxX: 60
   sensitivity: 0.3
   cam: {fileID: 4186822761417710509}
+  look: {x: 0, y: 0}
   sprintBobSpeed: 19
   runBobSpeed: 13
   sprintBobAmount: 0.07
