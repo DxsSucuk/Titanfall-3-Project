@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using Utilities;
 
 public class AccesTitan : NetworkBehaviour
 {
@@ -12,18 +13,18 @@ public class AccesTitan : NetworkBehaviour
     
     [Networked]
     public EnterVanguardTitan TitanScript { get; set; }
+    
+    [SerializeField] private NetworkPrefabRef _vanguardTitanPrefab;
 
     PilotMovement moveScript;
-
-    GameObject[] titanDropPoints;
+    
     float shortestDistance = 0f;
-    Transform chosenPoint;
+    Vector3 chosenPoint;
 
     Animator animator;
 
     private void Start()
     {
-        titanDropPoints = GameObject.FindGameObjectsWithTag("DropPoint");
         moveScript = GetComponent<PilotMovement>();
         animator = GetComponentInChildren<Animator>();
     }
@@ -40,22 +41,36 @@ public class AccesTitan : NetworkBehaviour
         
         if (Input.GetKeyDown(KeyCode.V))
         {
-            MoveTitanToDropLocation();
-            TitanScript.StartFall();
+            if (TitanObject != null)
+                Runner.Despawn(TitanObject);
+            
+            SpawnToDropLocationRPC();
+            
+            if (TitanScript != null)
+                TitanScript.StartFall();
         }
     }
 
-    private void MoveTitanToDropLocation()
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    private void SpawnToDropLocationRPC()
     {
-        for (int i = 0; i < titanDropPoints.Length; i++)
+        if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
         {
-            float distance = Vector3.Distance(titanDropPoints[i].transform.position, this.transform.position);
-            if (distance < shortestDistance || shortestDistance == 0f)
+
+            Camera pilotCamera = networkPlayerObject.GetComponentInChildren<Camera>();
+
+            Vector3 direction = pilotCamera.transform.forward;
+
+            if (Physics.Raycast(pilotCamera.transform.position, direction, out RaycastHit hit))
             {
                 chosenPoint = hit.point;
             }
             else
             {
+<<<<<<< HEAD
+=======
+                // Fallback just in case.
+>>>>>>> parent of cec5383 (Merge pull request #3 from Harald234/revert-2-recode)
                 chosenPoint = networkPlayerObject.transform.position;
             }
 
@@ -66,12 +81,15 @@ public class AccesTitan : NetworkBehaviour
             
             if (HasInputAuthority)
             {
+<<<<<<< HEAD
                 ////networkPlayerTitanObject.gameObject.layer = 6;
                 ////LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
+=======
+                networkPlayerTitanObject.gameObject.layer = 6;
+                LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
+>>>>>>> parent of cec5383 (Merge pull request #3 from Harald234/revert-2-recode)
             }
         }
-        //trying to move the titan to a specific drop point, does not work, would be good if you cold spawn the titan at this point
-        TitanObject.transform.position = chosenPoint.transform.position;
     }
 
 
