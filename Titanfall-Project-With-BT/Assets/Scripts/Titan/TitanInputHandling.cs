@@ -8,7 +8,7 @@ public class TitanInputHandling : NetworkBehaviour
     VanguardCamera titanCamera;
     FireTitanRifle fireTitanRifle;
     
-    private void Start()
+    private void Awake()
     {
         titanCamera = GetComponent<VanguardCamera>();
         moveScript = GetComponent<VanguardMovement>();
@@ -21,12 +21,13 @@ public class TitanInputHandling : NetworkBehaviour
 
         var pressed = input.Buttons.GetPressed(ButtonsPrevious);
         
-        moveScript.shouldSprint = pressed.IsSet(NetworkPlayerButtons.SPRINT);
+        ButtonsPrevious = input.Buttons;
+        
+        moveScript.shouldSprint = input.Buttons.IsSet(NetworkPlayerButtons.SPRINT);
         moveScript.moveData = input.move;
         titanCamera.look = input.look * titanCamera.sensitivity;
 
-
-        if (pressed.IsSet(NetworkPlayerButtons.SHOOT))
+        if (input.Buttons.IsSet(NetworkPlayerButtons.SHOOT))
         {
             if (!moveScript.isSprinting)
             {

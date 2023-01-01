@@ -36540,7 +36540,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 959
+    m_Bits: 5055
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -41692,6 +41692,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 8
+  isFalling: 0
+  isGrounded: 0
   isEmbarking: 0
   inTitan: 0
   inRangeForEmbark: 0

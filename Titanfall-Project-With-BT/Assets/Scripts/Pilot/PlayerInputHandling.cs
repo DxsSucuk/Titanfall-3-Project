@@ -6,12 +6,12 @@ public class PlayerInputHandling : NetworkBehaviour
 
     public bool canShoot, shouldReload;
     public int weapon;
-    
+
     WeaponSwitching weaponSwitch;
     PilotMovement moveScript;
     PilotCamera pilotCamera;
 
-    private void Start()
+    private void Awake()
     {
         pilotCamera = GetComponentInParent<PilotCamera>();
         weaponSwitch = GetComponentInChildren<WeaponSwitching>();
@@ -21,7 +21,7 @@ public class PlayerInputHandling : NetworkBehaviour
     public override void FixedUpdateNetwork()
     {
         if (GetInput<NetworkPlayerInput>(out var input) == false) return;
-        
+
         var pressed = input.Buttons.GetPressed(ButtonsPrevious);
 
         ButtonsPrevious = input.Buttons;
@@ -30,6 +30,7 @@ public class PlayerInputHandling : NetworkBehaviour
         moveScript.shouldSprint = input.Buttons.IsSet(NetworkPlayerButtons.SPRINT);
         moveScript.shouldJump = pressed.IsSet(NetworkPlayerButtons.JUMP);
         moveScript.moveData = input.move;
+
         pilotCamera.look = input.look * pilotCamera.sensitivity;
 
         if (input.Buttons.IsSet(NetworkPlayerButtons.SHOOT))

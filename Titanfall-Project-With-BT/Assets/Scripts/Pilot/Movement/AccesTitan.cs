@@ -5,17 +5,13 @@ using Utilities;
 
 public class AccesTitan : NetworkBehaviour
 {
-    [Networked]
-    public NetworkObject TitanObject { get; set; }
-    
-    [Networked]
-    public EnterVanguardTitan TitanScript { get; set; }
+    public NetworkObject TitanObject;
+
+    public EnterVanguardTitan TitanScript;
     
     [SerializeField] private NetworkPrefabRef _vanguardTitanPrefab;
 
     PilotMovement moveScript;
-    
-    Vector3 chosenPoint;
 
     Animator animator;
 
@@ -40,19 +36,17 @@ public class AccesTitan : NetworkBehaviour
             if (TitanObject != null)
                 Runner.Despawn(TitanObject);
             
-            SpawnToDropLocationRPC();
-            
-            if (TitanScript != null)
-                TitanScript.StartFall();
+            GetDropPointRPC();
         }
     }
 
-    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
-    private void SpawnToDropLocationRPC()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, InvokeLocal = false)]
+    private void GetDropPointRPC()
     {
+        Vector3 chosenPoint = Vector3.zero;
+        
         if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
         {
-
             Camera pilotCamera = networkPlayerObject.GetComponentInChildren<Camera>();
 
             Vector3 direction = pilotCamera.transform.forward;
@@ -66,26 +60,41 @@ public class AccesTitan : NetworkBehaviour
                 // Fallback just in case.
                 chosenPoint = networkPlayerObject.transform.position;
             }
-
-            Vector3 spawnPosition = chosenPoint + new Vector3(0, 150, 0);
+        }
+        
+        chosenPoint += new Vector3(0, 150, 0);
+        
+        SpawnToDropLocation(chosenPoint);
+    }
+    
+    private void SpawnToDropLocation(Vector3 vectorPosition)
+    {
+        if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
+        {
             TitanObject =
-                Runner.Spawn(_vanguardTitanPrefab, spawnPosition, Quaternion.identity,
-                    Runner.LocalPlayer);
+                Runner.Spawn(_vanguardTitanPrefab, vectorPosition, Quaternion.identity,
+                    Object.InputAuthority);
             
+            SetTitanDataRPC(TitanObject.Id);
+        }
+    }
+    
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.InputAuthority, InvokeLocal = false)]
+    private void SetTitanDataRPC(NetworkId networkPlayerTitanId)
+    {
+        TitanScript = Runner.TryGetNetworkedBehaviourFromNetworkedObjectRef<EnterVanguardTitan>(networkPlayerTitanId);
+        TitanObject = TitanScript.Object;
 
-            EnterVanguardTitan enterVanguardTitan = TitanObject.GetComponent<EnterVanguardTitan>();
+        if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
+        {
+            TitanScript.player = networkPlayerObject.gameObject;
 
-            enterVanguardTitan.player = networkPlayerObject.gameObject;
-
-            TitanScript = enterVanguardTitan;
-            
             if (HasInputAuthority)
             {
-                enterVanguardTitan.playerCamera = networkPlayerObject.GetComponentInChildren<Camera>().gameObject;
+                TitanScript.playerCamera = networkPlayerObject.GetComponentInChildren<Camera>().gameObject;
                 TitanObject.gameObject.layer = 6;
                 LayerUtility.ReplaceLayerRecursively(TitanObject.transform, 9, 6);
             }
-            
         }
     }
 
@@ -103,8 +112,14 @@ public class AccesTitan : NetworkBehaviour
             moveScript.canMove = false;
             moveScript.embarking = true;
             moveScript.embarkPos = TitanScript.embarkPos.position;
-            animator.SetTrigger("embark");
+            PlayAnimationRPC();
         }
+    }
+
+    [Rpc]
+    public void PlayAnimationRPC()
+    {
+        animator.SetTrigger("embark");
     }
 
     public void ExitTitan()
