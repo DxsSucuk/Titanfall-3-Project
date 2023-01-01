@@ -106,7 +106,7 @@ public class VanguardMovement : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!HasStateAuthority) return;
+        if (!HasInputAuthority) return;
 
         if (enterScript != null && enterScript.inTitan)
         {

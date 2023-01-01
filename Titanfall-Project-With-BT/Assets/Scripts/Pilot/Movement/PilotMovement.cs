@@ -14,6 +14,9 @@ public class PilotMovement : NetworkBehaviour
     public Animator animator;
     public Rig rig;
 
+    private PlayerInput controls;
+    private InputAction jumpAction;
+
     public Transform groundCheck;
 
     public LayerMask groundMask;
@@ -30,7 +33,7 @@ public class PilotMovement : NetworkBehaviour
     [Header("Basic Movement")]
     Vector3 move;
     Vector3 input;
-    public Vector2 moveData;
+    Vector2 moveData;
     Vector3 Yvelocity;
     Vector3 forwardDirection;
     Vector3 jumpForward;
@@ -50,13 +53,12 @@ public class PilotMovement : NetworkBehaviour
 
     public bool canMove = true;
 
-    public bool shouldSprint;
+    bool shouldSprint;
     public bool isSprinting;
-    public bool shouldCrouch;
-    public bool isCrouching;
-    public bool shouldJump;
+    bool shouldCrouch;
+    bool isCrouching;
     public bool isSliding;
-    public bool isWallRunning;
+    bool isWallRunning;
     public bool isGrounded;
     public bool isMoving;
 
@@ -132,6 +134,9 @@ public class PilotMovement : NetworkBehaviour
         controller = GetComponent<CharacterController>();
         startHeight = transform.localScale.y;
         normalFov = playerCamera.fieldOfView;
+
+        controls = GetComponent<PlayerInput>();
+        jumpAction = controls.actions["Jump"];
     }
 
     void IncreaseSpeed(float speedIncrease)
@@ -146,10 +151,10 @@ public class PilotMovement : NetworkBehaviour
 
     void Update()
     {
-        if (!HasStateAuthority)
+        if (!HasInputAuthority)
             return;
 
-        if (transform == null)
+        if (this.transform == null)
             return;
 
         if (embarking)
@@ -219,6 +224,21 @@ public class PilotMovement : NetworkBehaviour
 
     //Input
 
+    public void OnMove(InputValue value)
+    {
+        moveData = value.Get<Vector2>();
+    }
+
+    public void OnSprint(InputValue value)
+    {
+        shouldSprint = value.isPressed;
+    }
+
+    public void OnCrouch(InputValue value)
+    {
+        shouldCrouch = value.isPressed;
+    }
+
     void HandleInput()
     {
         input = new Vector3(moveData.x, 0f, moveData.y);
@@ -252,7 +272,7 @@ public class PilotMovement : NetworkBehaviour
             isSprinting = false;
         }
 
-        if (shouldJump && jumpCharges > 0)
+        if (jumpAction.triggered && jumpCharges > 0)
         {
             Invoke("Jump", jumpCooldown);
         }
@@ -363,7 +383,7 @@ public class PilotMovement : NetworkBehaviour
     {
         if (!isGrounded && !isWallRunning)
             inAir -= 1f * Time.deltaTime;
-        if (shouldJump && inAir > 0)
+        if (jumpAction.triggered && inAir > 0)
             jumpCharges += 1;
     }
 
