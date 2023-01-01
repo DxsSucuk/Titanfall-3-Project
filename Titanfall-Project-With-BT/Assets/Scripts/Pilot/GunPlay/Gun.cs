@@ -67,7 +67,7 @@ public class NewBehaviourScript : MonoBehaviour
         //RayCast
         if (Physics.Raycast(fpsCam.transform.position, direction, out rayHit, range, whatIsEnemy))
         {
-            Debug.Log(rayHit.collider.name);
+            // Debug.Log(rayHit.collider.name);
 
             //if (rayHit.collider.CompareTag("Enemy"))
             //rayHit.collider.GetComponent<ShootingAi>().TakeDamage(damage);

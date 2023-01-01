@@ -1,4 +1,5 @@
 using Fusion;
+using UnityEngine;
 
 public class TitanInputHandling : NetworkBehaviour
 {
@@ -17,7 +18,11 @@ public class TitanInputHandling : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (GetInput<NetworkPlayerInput>(out var input) == false) return;
+        if (GetInput<NetworkPlayerInput>(out var input) == false)
+        {
+            Debug.Log("No Input!");
+            return;
+        }
 
         var pressed = input.Buttons.GetPressed(ButtonsPrevious);
         

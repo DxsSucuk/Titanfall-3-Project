@@ -76,13 +76,13 @@ public class EnterVanguardTitan : NetworkBehaviour
             networkObject.gameObject.GetComponent<AccesTitan>().ExitTitan();
         }
     }
-
+    
     public IEnumerator Embark()
     {
         playerCamera.SetActive(false);
         embarkTitanCamera.SetActive(true);
         rangeCheck.enabled = false;
-        PlayAnimation();
+        PlayAnimationRPC();
         isEmbarking = true;
 
         yield return new WaitForSeconds(1.5f);
@@ -96,15 +96,21 @@ public class EnterVanguardTitan : NetworkBehaviour
         Player_HideRPC();
         embarkTitanCamera.SetActive(false);
         titanCamera.SetActive(true);
-
-        inTitan = true;
-        isEmbarking = false;
+        
+        SetTitanRPC(true, false);
     }
 
-    [Rpc]
-    public void PlayAnimation()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    void PlayAnimationRPC()
     {
         titanAnimator.SetTrigger("Embark");
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    void SetTitanRPC(bool titan, bool embark)
+    {
+        inTitan = titan;
+        isEmbarking = embark;
     }
 
     void OnTriggerEnter()
@@ -124,7 +130,7 @@ public class EnterVanguardTitan : NetworkBehaviour
             Player_ShowRPC();
             playerCamera.SetActive(true);
             titanCamera.SetActive(false);
-            inTitan = false;
+            SetTitanRPC(false, false);
             rangeCheck.enabled = true;
             player.transform.parent = null;
         }

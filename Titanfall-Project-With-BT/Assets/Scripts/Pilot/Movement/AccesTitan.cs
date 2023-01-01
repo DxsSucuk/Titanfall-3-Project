@@ -79,7 +79,7 @@ public class AccesTitan : NetworkBehaviour
         }
     }
     
-    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.InputAuthority, InvokeLocal = false)]
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.InputAuthority, InvokeLocal = true)]
     private void SetTitanDataRPC(NetworkId networkPlayerTitanId)
     {
         TitanScript = Runner.TryGetNetworkedBehaviourFromNetworkedObjectRef<EnterVanguardTitan>(networkPlayerTitanId);

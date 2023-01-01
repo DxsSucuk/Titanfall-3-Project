@@ -66,7 +66,7 @@ public class NetworkPlayerInputProvider : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
     {
-        // Debug.Log("Input by " + player.PlayerId + " is missing! (Input -> " + input + ")");
+        Debug.Log("Input by " + player.PlayerId + " is missing! (Input -> " + input + ")");
     }
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
