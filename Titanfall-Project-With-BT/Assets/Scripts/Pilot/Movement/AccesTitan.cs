@@ -67,10 +67,7 @@ public class AccesTitan : NetworkBehaviour
             }
             else
             {
-<<<<<<< HEAD
-=======
                 // Fallback just in case.
->>>>>>> parent of cec5383 (Merge pull request #3 from Harald234/revert-2-recode)
                 chosenPoint = networkPlayerObject.transform.position;
             }
 
@@ -81,13 +78,8 @@ public class AccesTitan : NetworkBehaviour
             
             if (HasInputAuthority)
             {
-<<<<<<< HEAD
                 ////networkPlayerTitanObject.gameObject.layer = 6;
                 ////LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
-=======
-                networkPlayerTitanObject.gameObject.layer = 6;
-                LayerUtility.SetLayerRecrusivly(networkPlayerTitanObject.transform);
->>>>>>> parent of cec5383 (Merge pull request #3 from Harald234/revert-2-recode)
             }
         }
     }
