@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -5,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Fusion;
 using UnityEngine.Animations.Rigging;
+using Utilities;
 
 public class PilotMovement : NetworkBehaviour
 {
@@ -13,9 +15,6 @@ public class PilotMovement : NetworkBehaviour
 
     public Animator animator;
     public Rig rig;
-
-    private PlayerInput controls;
-    private InputAction jumpAction;
 
     public Transform groundCheck;
 
@@ -33,7 +32,7 @@ public class PilotMovement : NetworkBehaviour
     [Header("Basic Movement")]
     Vector3 move;
     Vector3 input;
-    Vector2 moveData;
+    public Vector2 moveData;
     Vector3 Yvelocity;
     Vector3 forwardDirection;
     Vector3 jumpForward;
@@ -53,12 +52,13 @@ public class PilotMovement : NetworkBehaviour
 
     public bool canMove = true;
 
-    bool shouldSprint;
+    public bool shouldSprint;
     public bool isSprinting;
-    bool shouldCrouch;
-    bool isCrouching;
+    public bool shouldCrouch;
+    public bool isCrouching;
+    public bool shouldJump;
     public bool isSliding;
-    bool isWallRunning;
+    public bool isWallRunning;
     public bool isGrounded;
     public bool isMoving;
 
@@ -128,15 +128,19 @@ public class PilotMovement : NetworkBehaviour
     public float cameraChangeTime;
     public float wallRunTilt;
     public float tilt;
-
+    
     void Start()
     {
+        if (!HasInputAuthority)
+        {
+            LayerUtility.ReplaceLayerRecursively(transform,8, 12);
+            LayerUtility.ReplaceLayerRecursively(transform,11, 8);
+            velocityText.transform.parent.gameObject.SetActive(false);
+        }
+        
         controller = GetComponent<CharacterController>();
         startHeight = transform.localScale.y;
         normalFov = playerCamera.fieldOfView;
-
-        controls = GetComponent<PlayerInput>();
-        jumpAction = controls.actions["Jump"];
     }
 
     void IncreaseSpeed(float speedIncrease)
@@ -151,10 +155,10 @@ public class PilotMovement : NetworkBehaviour
 
     void Update()
     {
-        if (!HasInputAuthority)
+        if (!HasStateAuthority)
             return;
 
-        if (this.transform == null)
+        if (transform == null)
             return;
 
         if (embarking)
@@ -224,21 +228,6 @@ public class PilotMovement : NetworkBehaviour
 
     //Input
 
-    public void OnMove(InputValue value)
-    {
-        moveData = value.Get<Vector2>();
-    }
-
-    public void OnSprint(InputValue value)
-    {
-        shouldSprint = value.isPressed;
-    }
-
-    public void OnCrouch(InputValue value)
-    {
-        shouldCrouch = value.isPressed;
-    }
-
     void HandleInput()
     {
         input = new Vector3(moveData.x, 0f, moveData.y);
@@ -272,7 +261,7 @@ public class PilotMovement : NetworkBehaviour
             isSprinting = false;
         }
 
-        if (jumpAction.triggered && jumpCharges > 0)
+        if (shouldJump && jumpCharges > 0)
         {
             Invoke("Jump", jumpCooldown);
         }
@@ -383,7 +372,7 @@ public class PilotMovement : NetworkBehaviour
     {
         if (!isGrounded && !isWallRunning)
             inAir -= 1f * Time.deltaTime;
-        if (jumpAction.triggered && inAir > 0)
+        if (shouldJump && inAir > 0)
             jumpCharges += 1;
     }
 

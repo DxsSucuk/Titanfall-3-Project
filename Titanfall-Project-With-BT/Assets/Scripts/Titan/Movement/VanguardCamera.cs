@@ -32,7 +32,7 @@ public class VanguardCamera : NetworkBehaviour
     private float timer;
  
     Vector3 lastMousePosition;
-    Vector2 look;
+    public Vector2 look;
  
     void Awake()
     {
@@ -57,16 +57,10 @@ public class VanguardCamera : NetworkBehaviour
         }
     }
 
-    public void OnLook(InputValue value)
-    {
-        look = value.Get<Vector2>() * sensitivity;
-    }
-
     void Update()
     {
         if (enterScript.inTitan)
         {
-           
             rotY += look.x;
             rotX += look.y;
  

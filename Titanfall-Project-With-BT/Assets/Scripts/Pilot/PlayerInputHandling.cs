@@ -1,47 +1,71 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.InputSystem;
+using Fusion;
 
-public class PlayerInputHandling : MonoBehaviour
+public class PlayerInputHandling : NetworkBehaviour
 {
+    [Networked] public NetworkButtons ButtonsPrevious { get; set; }
+
     public bool canShoot, shouldReload;
     public int weapon;
+
     WeaponSwitching weaponSwitch;
     PilotMovement moveScript;
+    PilotCamera pilotCamera;
 
-    private void Start()
+    private void Awake()
     {
+        pilotCamera = GetComponentInParent<PilotCamera>();
         weaponSwitch = GetComponentInChildren<WeaponSwitching>();
         moveScript = GetComponentInParent<PilotMovement>();
     }
-    public void OnFire(InputValue value)
-    {
-        if (!moveScript.isSprinting)
-            canShoot = value.isPressed;
-    }
-    public void OnReload(InputValue value)
-    {
-        shouldReload = value.isPressed;
-    }
 
-    public void OnPrimary()
+    public override void FixedUpdateNetwork()
     {
-        weapon = 1;
-        weaponSwitch.Select();
-        weaponSwitch.HandleRig();
-    }
-    public void OnSecondary()
-    {
-        weapon = 2;
-        weaponSwitch.Select();
-        weaponSwitch.HandleRig();
-    }
-    public void OnAntiTitan()
-    {
-        weapon = 3;
-        weaponSwitch.Select();
-        weaponSwitch.HandleRig();
-    }
+        if (GetInput<NetworkPlayerInput>(out var input) == false) return;
 
+        var pressed = input.Buttons.GetPressed(ButtonsPrevious);
+
+        ButtonsPrevious = input.Buttons;
+
+        moveScript.shouldCrouch = input.Buttons.IsSet(NetworkPlayerButtons.CROUCH);
+        moveScript.shouldSprint = input.Buttons.IsSet(NetworkPlayerButtons.SPRINT);
+        moveScript.shouldJump = pressed.IsSet(NetworkPlayerButtons.JUMP);
+        moveScript.moveData = input.move;
+
+        pilotCamera.look = input.look * pilotCamera.sensitivity;
+
+        if (input.Buttons.IsSet(NetworkPlayerButtons.SHOOT))
+        {
+            if (!moveScript.isSprinting)
+            {
+                canShoot = true;
+            }
+        }
+        else
+        {
+            canShoot = false;
+        }
+
+        shouldReload = pressed.IsSet(NetworkPlayerButtons.RELOAD);
+
+        if (pressed.IsSet(NetworkPlayerButtons.SWITCH_PRIMARY))
+        {
+            weapon = 1;
+            weaponSwitch.Select();
+            weaponSwitch.HandleRig();
+        }
+
+        if (pressed.IsSet(NetworkPlayerButtons.SWITCH_SECONDARY))
+        {
+            weapon = 2;
+            weaponSwitch.Select();
+            weaponSwitch.HandleRig();
+        }
+
+        if (pressed.IsSet(NetworkPlayerButtons.SWITCH_ANTI))
+        {
+            weapon = 3;
+            weaponSwitch.Select();
+            weaponSwitch.HandleRig();
+        }
+    }
 }

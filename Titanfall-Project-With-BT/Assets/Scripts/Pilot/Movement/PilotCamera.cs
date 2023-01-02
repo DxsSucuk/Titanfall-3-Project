@@ -12,9 +12,13 @@ public class PilotCamera : NetworkBehaviour
     public float sensitivity;
     public Camera cam;
 
-    Vector2 look;
-    float rotY = 0f;
-    float rotX = 0f;
+    public Vector2 look;
+    
+    [Networked]
+    private float rotY { get; set; }
+    
+    [Networked]
+    private float rotX { get; set; }
 
     PilotMovement move;
 
@@ -36,7 +40,7 @@ public class PilotCamera : NetworkBehaviour
             }
         }
 
-        if (this.transform == null)
+        if (transform == null)
             return;
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -45,12 +49,7 @@ public class PilotCamera : NetworkBehaviour
 
         defaultY = cam.transform.localPosition.y;
     }
-
-    public void OnLook(InputValue value)
-    {
-        look = value.Get<Vector2>()*sensitivity;
-    }
-
+    
     void Update()
     {
         if (move.canMove == false)
@@ -72,7 +71,8 @@ public class PilotCamera : NetworkBehaviour
         if (move.isMoving && move.isGrounded && !move.isSliding)
         {
             timer += Time.deltaTime * (move.isSprinting ? sprintBobSpeed : runBobSpeed);
-            cam.transform.localPosition = new Vector3(cam.transform.localPosition.x, defaultY + Mathf.Sin(timer) * (move.isSprinting ? sprintBobAmount : runBobAmount), cam.transform.localPosition.z);
+            Transform camTransform = cam.transform;
+            camTransform.localPosition = new Vector3(camTransform.localPosition.x, defaultY + Mathf.Sin(timer) * (move.isSprinting ? sprintBobAmount : runBobAmount), camTransform.localPosition.z);
         }
     }
 

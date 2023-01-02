@@ -1,29 +1,22 @@
 using Fusion;
 
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using Utilities;
 
 public class AccesTitan : NetworkBehaviour
 {
-    [Networked]
-    public NetworkObject TitanObject { get; set; }
+    public NetworkObject TitanObject;
+
+    public EnterVanguardTitan TitanScript;
     
-    [Networked]
-    public EnterVanguardTitan TitanScript { get; set; }
+    [SerializeField] private NetworkPrefabRef _vanguardTitanPrefab;
 
     PilotMovement moveScript;
-
-    GameObject[] titanDropPoints;
-    float shortestDistance = 0f;
-    Transform chosenPoint;
 
     Animator animator;
 
     private void Start()
     {
-        titanDropPoints = GameObject.FindGameObjectsWithTag("DropPoint");
         moveScript = GetComponent<PilotMovement>();
         animator = GetComponentInChildren<Animator>();
     }
@@ -40,26 +33,70 @@ public class AccesTitan : NetworkBehaviour
         
         if (Input.GetKeyDown(KeyCode.V))
         {
-            MoveTitanToDropLocation();
-            TitanScript.StartFall();
+            if (TitanObject != null)
+                Runner.Despawn(TitanObject);
+            
+            GetDropPointRPC();
         }
     }
 
-    private void MoveTitanToDropLocation()
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority, InvokeLocal = false)]
+    private void GetDropPointRPC()
     {
-        for (int i = 0; i < titanDropPoints.Length; i++)
+        Vector3 chosenPoint = Vector3.zero;
+        
+        if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
         {
-            float distance = Vector3.Distance(titanDropPoints[i].transform.position, this.transform.position);
-            if (distance < shortestDistance || shortestDistance == 0f)
+            Camera pilotCamera = networkPlayerObject.GetComponentInChildren<Camera>();
+
+            Vector3 direction = pilotCamera.transform.forward;
+
+            if (Physics.Raycast(pilotCamera.transform.position, direction, out RaycastHit hit))
             {
-                shortestDistance = distance;
-                chosenPoint = titanDropPoints[i].transform;
+                chosenPoint = hit.point;
+            }
+            else
+            {
+                // Fallback just in case.
+                chosenPoint = networkPlayerObject.transform.position;
             }
         }
-        //trying to move the titan to a specific drop point, does not work, would be good if you cold spawn the titan at this point
-        TitanObject.transform.position = chosenPoint.transform.position;
+        
+        chosenPoint += new Vector3(0, 150, 0);
+        
+        SpawnToDropLocation(chosenPoint);
     }
+    
+    private void SpawnToDropLocation(Vector3 vectorPosition)
+    {
+        if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
+        {
+            TitanObject =
+                Runner.Spawn(_vanguardTitanPrefab, vectorPosition, Quaternion.identity,
+                    Object.InputAuthority);
+            
+            SetTitanDataRPC(TitanObject.Id);
+        }
+    }
+    
+    [Rpc(sources: RpcSources.StateAuthority, targets: RpcTargets.InputAuthority, InvokeLocal = true)]
+    private void SetTitanDataRPC(NetworkId networkPlayerTitanId)
+    {
+        TitanScript = Runner.TryGetNetworkedBehaviourFromNetworkedObjectRef<EnterVanguardTitan>(networkPlayerTitanId);
+        TitanObject = TitanScript.Object;
 
+        if (Runner.TryGetPlayerObject(Object.InputAuthority, out NetworkObject networkPlayerObject))
+        {
+            TitanScript.player = networkPlayerObject.gameObject;
+
+            if (HasInputAuthority)
+            {
+                TitanScript.playerCamera = networkPlayerObject.GetComponentInChildren<Camera>().gameObject;
+                TitanObject.gameObject.layer = 6;
+                LayerUtility.ReplaceLayerRecursively(TitanObject.transform, 9, 6);
+            }
+        }
+    }
 
     void EmbarkWithTitan()
     {
@@ -75,8 +112,14 @@ public class AccesTitan : NetworkBehaviour
             moveScript.canMove = false;
             moveScript.embarking = true;
             moveScript.embarkPos = TitanScript.embarkPos.position;
-            animator.SetTrigger("embark");
+            PlayAnimationRPC();
         }
+    }
+
+    [Rpc]
+    public void PlayAnimationRPC()
+    {
+        animator.SetTrigger("embark");
     }
 
     public void ExitTitan()

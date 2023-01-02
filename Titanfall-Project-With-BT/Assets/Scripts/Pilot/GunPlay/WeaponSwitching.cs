@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using Utilities;
 
-public class WeaponSwitching : MonoBehaviour
+public class WeaponSwitching : NetworkBehaviour
 {
     PlayerInputHandling inputHandling;
     public GameObject primary;
@@ -37,6 +39,12 @@ public class WeaponSwitching : MonoBehaviour
         Instantiate(publicSecondary, publicWeaponSwitcher.transform);
         Instantiate(publicAntiTitan, publicWeaponSwitcher.transform);
 
+        if (!HasInputAuthority)
+        {
+            LayerUtility.ReplaceLayerRecursively(publicWeaponSwitcher.transform,8, 12);
+            LayerUtility.ReplaceLayerRecursively(transform,11, 8);
+        }
+
         Select();
     }
 
@@ -55,9 +63,13 @@ public class WeaponSwitching : MonoBehaviour
         {
             i++;
             if (i == inputHandling.weapon)
+            {
                 weapon.gameObject.SetActive(true);
+            }
             else
+            {
                 weapon.gameObject.SetActive(false);
+            }
         }
 
         i = 0;

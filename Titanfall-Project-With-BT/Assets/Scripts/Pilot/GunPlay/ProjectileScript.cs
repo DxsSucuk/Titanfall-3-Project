@@ -39,7 +39,7 @@ public class ProjectileScript : MonoBehaviour
         {
             IDamageable damageable = enemies[i].GetComponent<IDamageable>();
             if (damageable != null)
-                damageable.Damage(projectile.damage, projectile.armorPiercing);
+                damageable.DamageRPC(projectile.damage, projectile.armorPiercing);
         }
 
         Instantiate(projectile.impactEffect, transform.position, Quaternion.identity);

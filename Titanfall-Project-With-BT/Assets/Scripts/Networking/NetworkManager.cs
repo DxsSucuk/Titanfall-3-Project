@@ -4,41 +4,54 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Utilities;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {
-    NetworkRunner _runner;
+    public NetworkRunner Runner;
 
     [SerializeField] private NetworkPrefabRef _playerPrefab;
 
     [SerializeField] private NetworkPrefabRef _vanguardTitanPrefab;
 
-    public Transform spawnA;
-    public Transform spawnB;
+    public GameObject InputProviderGameObject;
+
+    public GameObject[] spawnPoints;
 
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
+    private void Awake()
+    {
+        spawnPoints = GameObject.FindGameObjectsWithTag("Respawn");
+    }
+
     async void StartGame(GameMode gameMode)
     {
-        _runner = gameObject.AddComponent<NetworkRunner>();
-        _runner.ProvideInput = true;
+        Runner = gameObject.AddComponent<NetworkRunner>();
+        Runner.ProvideInput = true;
 
-        await _runner.StartGame(new StartGameArgs()
+        await Runner.StartGame(new StartGameArgs()
         {
             GameMode = gameMode,
             SessionName = "WeBallin",
             Scene = SceneManager.GetActiveScene().buildIndex,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
         });
+        
+        InputProviderGameObject.SetActive(true);
     }
 
     private void OnGUI()
     {
-        if (_runner == null)
+        if (Runner == null)
         {
-            if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
+            if (GUI.Button(new Rect(0, 40, 200, 40), "Create"))
             {
-                StartGame(GameMode.Shared);
+                StartGame(GameMode.Host);
+            }
+            if (GUI.Button(new Rect(0, 100, 200, 40), "Join"))
+            {
+                StartGame(GameMode.Client);
             }
         }
     }
@@ -76,59 +89,45 @@ public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
-        // Ignore since we dont use a Host-Client scenario rn.
+        // Is being handled by the NetworkPilotInputProvider!
     }
 
     public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input)
     {
-        // No need for this right now.
-        Debug.Log("Input by " + player.PlayerId + " is missing! (Input -> " + input + ")");
+        // Is being handled by the NetworkPilotInputProvider!
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         Debug.Log("Player joined Server -> " + player.PlayerId);
-        if (runner.LocalPlayer == player)
+        if (runner.GameMode == GameMode.Shared || runner.GameMode == GameMode.Single)
         {
-            // Create a unique position for the player
-            Vector3 spawnPosition = spawnB.position;
-            Vector3 titanPosition = spawnPosition;
-            titanPosition.y = 178;
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-
-            runner.SetPlayerObject(player, networkPlayerObject);
-
-            NetworkObject networkPlayerTitanObject =
-                runner.Spawn(_vanguardTitanPrefab, titanPosition, Quaternion.identity, player);
-
-            networkPlayerTitanObject.gameObject.layer = 6;
-            SetLayerRecrusivly(networkPlayerTitanObject.transform);
-
-            AccesTitan accesTitan = networkPlayerObject.GetComponent<AccesTitan>();
-            accesTitan.TitanObject = networkPlayerTitanObject;
-            EnterVanguardTitan enterVanguardTitan = networkPlayerTitanObject.GetComponent<EnterVanguardTitan>();
-            enterVanguardTitan.player = networkPlayerObject.gameObject;
-
-            enterVanguardTitan.playerCamera = enterVanguardTitan.player.GetComponentInChildren<Camera>().gameObject;
-            accesTitan.TitanScript = enterVanguardTitan;
-
-            // Keep track of the player avatars so we can remove it when they disconnect
-            _spawnedCharacters.Add(player, networkPlayerObject);
-        }
-    }
-
-    private void SetLayerRecrusivly(Transform parent)
-    {
-        foreach (Transform child in parent)
-        {
-            if (child.gameObject.layer == 9)
+            if (runner.LocalPlayer == player)
             {
-                child.gameObject.layer = 6;
+                // Create a unique position for the player
+                Vector3 spawnPosition = spawnPoints[new System.Random().Next(spawnPoints.Length - 1)].transform.position;
+                NetworkObject networkPlayerObject =
+                    runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+
+                runner.SetPlayerObject(player, networkPlayerObject);
+
+                // Keep track of the player avatars so we can remove it when they disconnect
+                _spawnedCharacters.Add(player, networkPlayerObject);
             }
-
-            if (child.childCount > 0)
+        }
+        else
+        {
+            if (runner.IsServer)
             {
-                SetLayerRecrusivly(child);
+                // Create a unique position for the player
+                Vector3 spawnPosition = spawnPoints[new System.Random().Next(spawnPoints.Length - 1)].transform.position;
+                NetworkObject networkPlayerObject =
+                    runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+
+                runner.SetPlayerObject(player, networkPlayerObject);
+
+                // Keep track of the player avatars so we can remove it when they disconnect
+                _spawnedCharacters.Add(player, networkPlayerObject);
             }
         }
     }

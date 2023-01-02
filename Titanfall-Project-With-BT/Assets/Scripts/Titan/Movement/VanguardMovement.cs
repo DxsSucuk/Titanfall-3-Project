@@ -1,15 +1,10 @@
 using Fusion;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class VanguardMovement : NetworkBehaviour
 {
     CharacterController controller;
-
-    public PlayerInput controls;
-    public InputAction dashAction;
 
     public Transform groundCheck;
 
@@ -18,10 +13,11 @@ public class VanguardMovement : NetworkBehaviour
     public Animator titanAnimator;
 
     bool isRunning;
-    bool shouldWalk;
+    public bool shouldWalk;
     public bool isWalking;
-    bool shouldSprint;
+    public bool shouldSprint;
     public bool isSprinting;
+    public bool shouldDash;
     public bool isDashing;
     bool isGrounded;
     public bool isMoving;
@@ -36,7 +32,7 @@ public class VanguardMovement : NetworkBehaviour
     Vector3 move;
     Vector3 forwardDirection;
     Vector3 Yvelocity;
-    Vector2 moveData;
+    public Vector2 moveData;
 
     EnterVanguardTitan enterScript;
 
@@ -45,28 +41,8 @@ public class VanguardMovement : NetworkBehaviour
     {
         controller = GetComponent<CharacterController>();
         enterScript = GetComponent<EnterVanguardTitan>();
-
-        controls = GetComponent<PlayerInput>();
-        dashAction = controls.actions["Dash"];
     }
-
-
-    public void OnMove(InputValue value)
-    {
-        moveData = value.Get<Vector2>();
-    }
-
-    public void OnSprint(InputValue value)
-    {
-        shouldSprint = value.isPressed;
-    }
-
-    public void OnWalk(InputValue value)
-    {
-        shouldWalk = value.isPressed;
-    }
-
-
+    
     void HandleInput()
     {
         input = new Vector3(moveData.x, 0f, moveData.y);
@@ -97,7 +73,7 @@ public class VanguardMovement : NetworkBehaviour
             isWalking = false;
         }
 
-        if (dashAction.triggered && !isDashing)
+        if (shouldDash && !isDashing)
         {
             StartCoroutine(HandleDash());
         }
@@ -106,7 +82,7 @@ public class VanguardMovement : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!HasInputAuthority) return;
+        if (!HasStateAuthority) return;
 
         if (enterScript != null && enterScript.inTitan)
         {

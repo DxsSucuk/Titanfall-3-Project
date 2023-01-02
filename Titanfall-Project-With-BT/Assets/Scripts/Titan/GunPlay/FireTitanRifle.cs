@@ -22,8 +22,9 @@ public class FireTitanRifle : NetworkBehaviour
     public AudioClip gunShot;
     public AudioSource audioSource;
 
-    bool canShoot;
+    public bool canShoot;
     bool readyToShoot = true;
+    public bool shouldReload;
     bool isReloading = false;
 
     public float timeBetweenShots, timeBetweenShooting;
@@ -32,15 +33,6 @@ public class FireTitanRifle : NetworkBehaviour
 
     public int bulletsPerTap, bulletsLeft;
     int bulletsShot;
-
-    public PlayerInput controls;
-    public InputAction reloadAction;
-
-    private void Start()
-    {
-        controls = GetComponent<PlayerInput>();
-        reloadAction = controls.actions["Reload"];
-    }
 
     void HandleInput()
     {
@@ -51,15 +43,10 @@ public class FireTitanRifle : NetworkBehaviour
             ShootRPC();
         }
 
-        if (reloadAction.triggered && bulletsLeft < 500 && !moveScript.isDashing)
+        if (shouldReload && bulletsLeft < 500 && !moveScript.isDashing)
         {
             StartCoroutine(Reload());
         }
-    }
-
-    public void OnFire(InputValue value)
-    {
-        canShoot = value.isPressed;
     }
 
     void Update()
@@ -104,7 +91,7 @@ public class FireTitanRifle : NetworkBehaviour
 
             IDamageable damageable = hit.transform.GetComponent<IDamageable>();
             if (damageable != null)
-                damageable.Damage(10, 4);
+                damageable.DamageRPC(10, 4);
         }
 
         bulletsLeft--;

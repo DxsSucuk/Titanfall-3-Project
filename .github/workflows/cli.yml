@@ -1,0 +1,47 @@
+name: Unity CLI builds
+on:
+  workflow_dispatch: {}
+  release:
+    types: [published]
+jobs:
+  buildForWindowsAndLinux:
+    name: Build for ${{ matrix.targetPlatform }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ~/Titanfall-Project-With-BT
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneWindows64 # Build a Windows 64-bit standalone.
+          - StandaloneLinux64 # Build a Linux 64-bit standalone.
+    outputs:
+      buildVersion: ${{ steps.build.outputs.buildVersion }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          lfs: true
+      - uses: actions/cache@v2
+        with:
+          path: Titanfall-Project-With-BT/Library
+          key:
+            Library-${{ matrix.targetPlatform }}-${{ hashFiles('Assets/**', 'Packages/**',
+            'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ matrix.targetPlatform }}-
+            Library-
+      - uses: game-ci/unity-builder@v2
+        id: build
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          buildName: TF3-By-Harald
+          projectPath: Titanfall-Project-With-BT
+          targetPlatform: ${{ matrix.targetPlatform }}
+          versioning: Semantic
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Build-${{ matrix.targetPlatform }}
+          path: build/${{ matrix.targetPlatform }}

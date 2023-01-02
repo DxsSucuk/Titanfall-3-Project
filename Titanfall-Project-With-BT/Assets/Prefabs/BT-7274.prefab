@@ -36540,7 +36540,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 959
+    m_Bits: 5055
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -41536,7 +41536,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 895
+    m_Bits: 4991
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -41606,9 +41606,9 @@ GameObject:
   - component: {fileID: 6553414488199295633}
   - component: {fileID: 1775270118597831475}
   - component: {fileID: 7074905497601110381}
-  - component: {fileID: 8318890931827569869}
   - component: {fileID: 3488291470997359191}
   - component: {fileID: 693054234466384}
+  - component: {fileID: 1571029464207003496}
   m_Layer: 9
   m_Name: BT-7274
   m_TagString: Untagged
@@ -41692,6 +41692,8 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 8
+  isFalling: 0
+  isGrounded: 0
   isEmbarking: 0
   inTitan: 0
   inRangeForEmbark: 0
@@ -41727,29 +41729,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  controls: {fileID: 0}
-  dashAction:
-    m_Name: Dash
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: 202dd7e7-0129-48bc-99b5-50b0d343157d
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
   groundCheck: {fileID: 6743662488958111497}
   groundMask:
     serializedVersion: 2
     m_Bits: 8
   titanAnimator: {fileID: 5861193692946347020}
+  shouldWalk: 0
   isWalking: 0
+  shouldSprint: 0
   isSprinting: 0
+  shouldDash: 0
   isDashing: 0
   isMoving: 0
   walkSpeed: 5
   runSpeed: 11
   sprintSpeed: 15
   normalGravity: -13
+  moveData: {x: 0, y: 0}
 --- !u!114 &6743662489385095235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41774,6 +41770,7 @@ MonoBehaviour:
   walkBobAmount: 0.1
   sprintBobAmount: 0.3
   runBobAmount: 0.2
+  look: {x: 0, y: 0}
 --- !u!114 &6743662489385095292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41799,21 +41796,13 @@ MonoBehaviour:
   impactEffect: {fileID: 100002, guid: 720af6421c2b0404c9f1d93560a75c2b, type: 3}
   gunShot: {fileID: 8300000, guid: 141ec5a7b17544540ab2198c97512543, type: 3}
   audioSource: {fileID: 3488291470997359191}
+  canShoot: 0
+  shouldReload: 0
   timeBetweenShots: 0.5
   timeBetweenShooting: 0.08
   spread: 0.1
   bulletsPerTap: 1
   bulletsLeft: 40
-  controls: {fileID: 0}
-  reloadAction:
-    m_Name: Reload
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: b21bc434-a74c-40a5-a817-2805d91692e4
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
 --- !u!114 &6553414488199295633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41872,6 +41861,7 @@ MonoBehaviour:
   - {fileID: 6743662489385095292}
   - {fileID: 6553414488199295633}
   - {fileID: 7074905497601110381}
+  - {fileID: 1571029464207003496}
   SimulationBehaviours: []
 --- !u!114 &7074905497601110381
 MonoBehaviour:
@@ -41901,36 +41891,6 @@ MonoBehaviour:
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
---- !u!114 &8318890931827569869
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6743662489385095242}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 0d55f68a4392ee44cb1a1e0ce82405c8, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: VanguardTitan
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!82 &3488291470997359191
 AudioSource:
   m_ObjectHideFlags: 0
@@ -42043,6 +42003,19 @@ MonoBehaviour:
   deathEffect: {fileID: 6184535327023240012, guid: 61d392eca775c394299e99ccb1aa66a4, type: 3}
   upperbody: {fileID: 5668866107622762603}
   rifle: {fileID: 7570163887835254368}
+--- !u!114 &1571029464207003496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6743662489385095242}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7142aa4a56cd401eac9371ba4d351a8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
 --- !u!1 &6743662489393025859
 GameObject:
   m_ObjectHideFlags: 0
