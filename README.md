@@ -1,4 +1,4 @@
-# Titanfall-Project-With-BT
+# Titanfall-3
 This is a Unity Game made to replicate the movement based shooter Titanfall 1 and 2.
 
 # Multiplayer
