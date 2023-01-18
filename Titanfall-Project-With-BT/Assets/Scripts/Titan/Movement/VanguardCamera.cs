@@ -10,7 +10,8 @@ public class VanguardCamera : NetworkBehaviour
     public float minX = -60f;
     public float maxX = 60f;
  
-    public float sensitivity;
+    [Networked]
+    public float sensitivity { get; set; }
     public GameObject cameraGameObject;
     public Camera cam;
  

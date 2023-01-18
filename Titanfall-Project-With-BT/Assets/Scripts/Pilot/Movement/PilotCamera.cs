@@ -6,7 +6,8 @@ public class PilotCamera : NetworkBehaviour
     public float minX = -60f;
     public float maxX = 60f;
 
-    public float sensitivity;
+    [Networked]
+    public float sensitivity { get; set; }
     public Camera cam;
     public GameObject cameraGameObject;
 
