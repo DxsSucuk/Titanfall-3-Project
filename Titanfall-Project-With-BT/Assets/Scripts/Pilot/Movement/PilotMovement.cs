@@ -200,8 +200,37 @@ public class PilotMovement : NetworkBehaviour
         CameraEffects();
     }
 
+    void FixedNetworkUpdate()
+    {
+        if (!HasStateAuthority)
+            return;
+
+        if (transform == null)
+            return;
+        
+        if (canMove == false)
+            return;
+        
+        if (shouldJump && jumpCharges > 0)
+        {
+            Invoke("Jump", jumpCooldown);
+        }
+    }
+
     void FixedUpdate()
     {
+        
+        if (!HasStateAuthority)
+            return;
+
+        if (transform == null)
+            return;
+        
+        if (canMove == false)
+            return;
+        
+        HandleInput();
+        
         CheckGround();
         CheckMoving();
         CheckWallRun();
@@ -259,11 +288,6 @@ public class PilotMovement : NetworkBehaviour
         else if (!shouldSprint)
         {
             isSprinting = false;
-        }
-
-        if (shouldJump && jumpCharges > 0)
-        {
-            Invoke("Jump", jumpCooldown);
         }
     }
 

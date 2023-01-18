@@ -35,12 +35,17 @@ public class GunScript : MonoBehaviour
 
         playerMain = transform.root;
         gunValues.ammoLeft = gunValues.magSize;
+        
         publicMuzzlePoint = GameObject.Find(gunValues.name + publicMuzzle);
+        
         //Debug.Log(gunValues.name + publicMuzzle);
         GameObject flash = Instantiate(gunValues.muzzleFlash, muzzlePoint.transform) as GameObject;
         flash.layer = muzzlePoint.layer;
+        
         GameObject flash2 = Instantiate(gunValues.muzzleFlash, publicMuzzlePoint.transform) as GameObject;
         flash2.layer = publicMuzzlePoint.layer;
+        
+        Switch();
     }
 
     public void Switch()
