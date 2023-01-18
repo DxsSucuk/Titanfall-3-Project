@@ -42,12 +42,14 @@ public class PilotCamera : NetworkBehaviour
                 audioListener.enabled = false;
             }
         }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
 
         if (transform == null)
             return;
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
 
         defaultY = cam.transform.localPosition.y;
     }

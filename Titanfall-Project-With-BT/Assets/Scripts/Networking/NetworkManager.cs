@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Fusion.Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Object = System.Object;
 
 public class NetworkManager : MonoBehaviour, INetworkRunnerCallbacks
 {

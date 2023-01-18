@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -200,7 +198,7 @@ public class PilotMovement : NetworkBehaviour
         CameraEffects();
     }
 
-    void FixedNetworkUpdate()
+    public override void FixedUpdateNetwork()
     {
         if (!HasStateAuthority)
             return;
@@ -255,7 +253,7 @@ public class PilotMovement : NetworkBehaviour
     }
 
 
-    //Input
+    #region Input
 
     void HandleInput()
     {
@@ -291,8 +289,9 @@ public class PilotMovement : NetworkBehaviour
         }
     }
 
+    #endregion
 
-    //Groundmovement
+    #region Groundmovement
 
     void CheckGround()
     {
@@ -360,9 +359,10 @@ public class PilotMovement : NetworkBehaviour
 
         move = Vector3.ClampMagnitude(move, speed);
     }
+    
+    #endregion
 
-
-    // Airmovement
+    #region Airmovement
 
     void Jump()
     {
@@ -495,9 +495,10 @@ public class PilotMovement : NetworkBehaviour
             Yvelocity.y += gravity * Time.deltaTime;
         controller.Move(Yvelocity * Time.deltaTime);
     }
-
-
-    // Wallrunning 
+    
+    #endregion
+    
+    #region Wallrunning 
 
     void CheckWallRun()
     {
@@ -610,8 +611,9 @@ public class PilotMovement : NetworkBehaviour
         wallDistance = 1f;
     }
 
+    #endregion
 
-    //Crouching/Slideing
+    #region Crouching/Slideing
 
     void Crouch()
     {
@@ -693,8 +695,9 @@ public class PilotMovement : NetworkBehaviour
         isSliding = false;
     }
 
+    #endregion
 
-    // Climbing
+    #region Climbing
 
     void CheckClimbing()
     {
@@ -749,9 +752,10 @@ public class PilotMovement : NetworkBehaviour
             }
         }
     }
+    
+    #endregion
 
-
-    // Camera Effects
+    #region Camera Effects
 
     void CameraEffects()
     {
@@ -813,6 +817,7 @@ public class PilotMovement : NetworkBehaviour
             controller.Move(offset * Time.deltaTime);
             //actually move the character.
         }
-
     }
+    
+    #endregion
 }
