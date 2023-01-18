@@ -6168,7 +6168,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &6226181833938332166
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -6185,7 +6185,7 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
 --- !u!114 &1310463187594430575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9454,8 +9454,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ObjectInterest: 1
   DefaultInterestGroups: []
-  DestroyWhenStateAuthorityLeaves: 0
-  AllowStateAuthorityOverride: 1
+  DestroyWhenStateAuthorityLeaves: 1
+  AllowStateAuthorityOverride: 0
   AoiPositionSource: {fileID: 0}
   Flags: 2305
   NetworkGuid:
@@ -9485,8 +9485,9 @@ MonoBehaviour:
   _interpolationDataSource: 0
   minX: -60
   maxX: 60
-  sensitivity: 0.3
+  _sensitivity: 0.3
   cam: {fileID: 8685051920708573616}
+  cameraGameObject: {fileID: 0}
   look: {x: 0, y: 0}
   sprintBobSpeed: 19
   runBobSpeed: 13

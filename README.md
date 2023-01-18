@@ -7,9 +7,6 @@ For the multiplayer we have used Photon Fusion to get a simple yet capable netwo
 
 Known Issues:
 - Special actions like jump and dash do not trigger sometimes.
-- Movement is janky on clients.
-- Camera movement doesn't work.
-- GunPlay fully broke in this fork.
 
 # Credits
 Mainly developed by [Harald](https://www.youtube.com/@harald1)<br>

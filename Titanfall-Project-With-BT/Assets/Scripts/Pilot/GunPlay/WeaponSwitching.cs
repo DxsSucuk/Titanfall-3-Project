@@ -32,23 +32,24 @@ public class WeaponSwitching : NetworkBehaviour
     private void Awake()
     {
         inputHandling = GetComponentInParent<PlayerInputHandling>();
-    }
-
-    private void Start()
-    {
-        Instantiate(primary, transform);
-        Instantiate(secondary, transform);
-        Instantiate(antiTitan, transform);
-
+        
         Instantiate(publicPrimary, publicWeaponSwitcher.transform);
         Instantiate(publicSecondary, publicWeaponSwitcher.transform);
         Instantiate(publicAntiTitan, publicWeaponSwitcher.transform);
+        
+        Instantiate(primary, transform);
+        Instantiate(secondary, transform);
+        Instantiate(antiTitan, transform);
 
         if (!HasInputAuthority)
         {
             LayerUtility.ReplaceLayerRecursively(publicWeaponSwitcher.transform,8, 12);
             LayerUtility.ReplaceLayerRecursively(transform,11, 8);
         }
+    }
+
+    private void Start()
+    {
 
         Select();
     }

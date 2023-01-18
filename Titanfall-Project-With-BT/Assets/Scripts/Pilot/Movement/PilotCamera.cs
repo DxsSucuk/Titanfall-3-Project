@@ -52,7 +52,7 @@ public class PilotCamera : NetworkBehaviour
         defaultY = cam.transform.localPosition.y;
     }
     
-    void LateUpdate()
+    void Update()
     {
         if (!HasStateAuthority)
             return;
